@@ -18,13 +18,13 @@ public class Player {
     public int playerXonMap = 568, playerYonMap = 468;
     public final int playerXonScreen = 568, playerYonScreen = 468;
     public double rotation = Math.toRadians (90);
-    //public double rotationDegrees = 90;
+    public double rotationDegrees = 90;
     private int movementSpeed = 3;
 
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
-    private int maxBulletLifetime = 300;
-    private int bulletSpeed = 1;
+    private int maxBulletLifetime = 500;
+    private int bulletSpeed = 5;
     private int counter = 0;
 
     //player image creation:
@@ -38,43 +38,64 @@ public class Player {
         }
     }
     public void drawPlayer (Graphics2D g2d) {
-        AffineTransform tx = AffineTransform.getRotateInstance(rotation, 32, 32);
-        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-        g2d.drawImage(op.filter(playerImg, null), playerXonScreen, playerYonScreen, null);
-
         //minimap player:
         g2d.fillRect(1070,120,10,10);
 
         //draw and update bullets
-
         for (int i = 0; i < bullets.size(); i++) {
             //get old bullet info
             int oldX = bullets.get(i).getBulletX();
             int oldY = bullets.get(i).getBulletY();
-            float angle = (float) bullets.get(i).getBulletDirection();
+            float degrees = (float) bullets.get(i).getBulletDirection();
             int oldLifetime = bullets.get(i).getLifetime();
 
-
-            //draw bullet
-            g2d.fillRect(oldX,oldY,5,5);
-            //System.out.println(angle);
-
+            //translate map positions to screen positions
+            //draw bullet //subtract screen X1 from bullet X and screen Y1 from bullet Y to get current screen position
+            int screenX1 = playerXonMap-568, screenY1 = playerYonMap-468;
+            g2d.fillRect(oldX-screenX1,oldY-screenY1,5,5);
 
             //update bullet position (at 1/10th of the framerate)
             if (counter == 10) {
-                double newBulletX, newBulletY, newLifetime;
+                double newBulletX = 0, newBulletY = 0, newLifetime;
                 newLifetime = oldLifetime + 1;
-                newBulletX = oldX + (bulletSpeed * Math.sin(angle));
-                newBulletY = oldY + (bulletSpeed * Math.cos(angle));
 
+                if (degrees >= 0 && degrees <=90) {
+                    float xMovePercentage = 1 - (degrees / 90);
+                    float yMovePercentage = (degrees / 90);
+                    newBulletX = oldX + (bulletSpeed * xMovePercentage);
+                    newBulletY = oldY + (bulletSpeed * yMovePercentage);
+                }
+                else if (degrees >= 90 && degrees <= 180) {
+                    degrees -= 90;
+                    float xMovePercentage = (degrees / 90);
+                    float yMovePercentage = 1 - (degrees / 90);
+                    newBulletX = oldX - (bulletSpeed * xMovePercentage);
+                    newBulletY = oldY + (bulletSpeed * yMovePercentage);
+                }
+                else if (degrees <=0 && degrees >= -90) {
+                    float xMovePercentage = 1 - (Math.abs(degrees / 90));
+                    float yMovePercentage = (Math.abs(degrees / 90));
+                    newBulletX = oldX + (bulletSpeed * xMovePercentage);
+                    newBulletY = oldY - (bulletSpeed * yMovePercentage);
+                }
+                else if (degrees <= -90 && degrees >= -180) {
+                    degrees += 90;
+                    float xMovePercentage = (Math.abs(degrees / 90));
+                    float yMovePercentage = 1 - (Math.abs(degrees / 90));
+                    newBulletX = oldX - (bulletSpeed * xMovePercentage);
+                    newBulletY = oldY - (bulletSpeed * yMovePercentage);
+                }
+
+//                newBulletX = oldX + (bulletSpeed * Math.sin(degrees));
+//                newBulletY = oldY + (bulletSpeed * Math.cos(degrees));
+
+                //save
                 bullets.get(i).setBulletX((int) newBulletX);
                 bullets.get(i).setBulletY((int) newBulletY);
                 bullets.get(i).setLifetime((int) newLifetime);
                 counter = 0;
             }
-            else {
-                counter++;
-            }
+            else { counter++; }
         }
 
         //check for end of lifetime on bullets
@@ -83,15 +104,20 @@ public class Player {
                 iter.remove();
             }
         }
+
+        //draw player
+        AffineTransform tx = AffineTransform.getRotateInstance(rotation, 32, 32);
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+        g2d.drawImage(op.filter(playerImg, null), playerXonScreen, playerYonScreen, null);
     }
 
     public void setRotation (Point mouseLocation) { //calculate angle mouseLocation from center
-        Point center =GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+        Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
         double xDistance = mouseLocation.getX() - center.getX();
         double yDistance = mouseLocation.getY() - center.getY();
         double degrees = Math.toDegrees(Math.atan2(yDistance, xDistance));
         rotation = Math.toRadians (degrees+90);
-        //rotationDegrees = degrees;
+        rotationDegrees = degrees;
         //System.out.println(degrees);
     }
 
@@ -99,19 +125,15 @@ public class Player {
         switch (direction) {
             case "Up":
                 playerYonMap -= movementSpeed;
-                moveBullets("Up");
                 break;
             case "Down":
                 playerYonMap += movementSpeed;
-                moveBullets("Down");
                 break;
             case "Left":
                 playerXonMap -= movementSpeed;
-                moveBullets("Left");
                 break;
             case "Right":
                 playerXonMap += movementSpeed;
-                moveBullets("Right");
                 break;
             default:
                 break;
@@ -120,36 +142,7 @@ public class Player {
 
     public void fireWeapon() {
 
-        bullets.add(new Bullet(600,500,rotation,0)); //add new bullet
+        bullets.add(new Bullet(playerXonMap,playerYonMap,rotationDegrees,0)); //add new bullet
     }
 
-    private void moveBullets(String direction) {
-        for (int i = 0; i < bullets.size(); i++) {
-            //get old bullet info
-            int oldX = bullets.get(i).getBulletX();
-            int oldY = bullets.get(i).getBulletY();
-
-            double newBulletX = oldX, newBulletY = oldY;
-
-            switch (direction) {
-                case "Up":
-                    newBulletY -= movementSpeed;
-                    break;
-                case "Down":
-                    newBulletY += movementSpeed;
-                    break;
-                case "Left":
-                    newBulletX -= movementSpeed;
-                    break;
-                case "Right":
-                    newBulletX += movementSpeed;
-                    break;
-                default:
-                    break;
-            }
-
-            bullets.get(i).setBulletX((int) newBulletX);
-            bullets.get(i).setBulletY((int) newBulletY);
-        }
-    }
 }
