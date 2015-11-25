@@ -22,26 +22,30 @@ public class MousepadListener implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent event) {
-
+        mouseClicked(event);
+        //System.out.println("mouse clicked");
     }
 
     @Override
     public void mouseReleased(MouseEvent event) {
-
+        clicked = false;
+        //System.out.println("mouse released");
     }
 
     @Override
     public void mouseEntered(MouseEvent event) {
-        mouseClicked(event);
+
     }
 
     @Override
     public void mouseExited(MouseEvent event) {
-        clicked = false;
+
     }
 
     public boolean isMousePressed() {
-        return true;
+        //System.out.println(clicked);
+        return clicked;
+
     }
 
     public int getX() {

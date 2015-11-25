@@ -43,6 +43,8 @@ public class GameGUI {
 
         //GUI
         g2d.drawImage(gui, 0,0,1200,1000,0,0,1200,1000, null);
+
+        //bullets
     }
 
     public void moveBackground(String direction) {

@@ -23,6 +23,11 @@ public class GameUpdater extends Screen {
     private int movementSpeed = 3;
     private int borderX = 0, borderY = 0;
 
+    //firing
+    private int firerate = 25; //4 per second
+    private int fireCooldown = firerate; //countdown for new bullet
+    private boolean firing = false;
+
 
     @Override
     public void onCreate() {
@@ -31,18 +36,46 @@ public class GameUpdater extends Screen {
 
     @Override
     public void onUpdate() {
+        //check WASD keys for movement
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_A)) { moveLeft(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_D)) { moveRight(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_W)) { moveUp(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_S)) { moveDown(); }
+
+
+        //update fire cooldown
+        if (fireCooldown >= firerate) {
+            firing = false;
+        }
+        else if (fireCooldown < firerate) {
+            fireCooldown++;
+            firing = true;
+        }
+        //System.out.println("firerate: " + fireCooldown);
+
+
+        //set player direction pointing towards mouse
         Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
         player.setRotation(mouseLocation);
+
+        //check mouseclick for shooting
+        //if (getScreenFactory().getGame().getMousepadListener().isMousePressed()) { shoot(); }
+        if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
     }
 
     @Override
     public void onDraw(Graphics2D g2d) {
         gui.drawGUI(g2d);
         player.drawPlayer(g2d);
+    }
+
+    private void shoot () {
+        //check fire cooldown
+        if (!firing) {
+            player.fireWeapon();
+            fireCooldown = 0;
+            //System.out.println("fired weapon");
+        }
     }
 
 
