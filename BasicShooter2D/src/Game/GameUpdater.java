@@ -21,7 +21,7 @@ public class GameUpdater extends Screen {
     private Player player = new Player();
 
     private int movementSpeed = 3;
-    private int borderX = 0, borderY = 0;
+    private int borderX = 700, borderY = 700;
 
     //firing
     private int firerate = 25; //4 per second

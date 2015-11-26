@@ -15,7 +15,9 @@ public class GameGUI {
     private Image background;
     private final String guiFileName = "Resources/GUI.png";
     private Image gui;
-    static int srcX1 = 0, srcY1 = 0, srcX2 = 1200, srcY2 = 1000; // default source window of background
+    private final String backgroundTemplateFileName = "Resources/bgMapTemplate.png";
+    private Image backgroundTemplate;
+    static int srcX1 = 700, srcY1 = 700, srcX2 = 1900, srcY2 = 1700; // default source window of background
     static final int destX1 = 0, destY1 = 0, destX2 = 1200, destY2 = 1000; // destination coordiantes of background
     private int movementSpeed = 3;
 
@@ -32,13 +34,22 @@ public class GameGUI {
         else {
             try { gui = ImageIO.read(imgUrl2); } catch (IOException ex) { ex.printStackTrace(); }
         }
+
+        URL imgUrl3 = getClass().getClassLoader().getResource(backgroundTemplateFileName);
+        if (imgUrl3 == null) { System.err.println("Couldn't find file: " + backgroundTemplateFileName); }
+        else {
+            try { backgroundTemplate = ImageIO.read(imgUrl3); } catch (IOException ex) { ex.printStackTrace(); }
+        }
     }
 
     public void drawGUI (Graphics2D g2d) {
         //background
-        g2d.drawImage(background, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null);
+        g2d.drawImage(background, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //map
+        //g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //raster line
 
         //minimap
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(950, 0, 250,250);
         g2d.drawImage(background, 950, 0, 1200, 250, srcX1, srcY1, srcX2, srcY2, null);
 
         //GUI

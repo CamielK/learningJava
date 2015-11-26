@@ -21,7 +21,6 @@ public class Player {
     public double rotationDegrees = 90;
     private int movementSpeed = 3;
 
-
     private List<Bullet> bullets = new ArrayList<Bullet>();
     private int maxBulletLifetime = 500;
     private int bulletSpeed = 5;
@@ -55,7 +54,7 @@ public class Player {
             g2d.fillRect(oldX-screenX1,oldY-screenY1,5,5);
 
             //update bullet position (at 1/10th of the framerate)
-            if (counter == 10) {
+            if (counter == 8) {
                 double newBulletX = 0, newBulletY = 0, newLifetime;
                 newLifetime = oldLifetime + 1;
 
@@ -118,7 +117,7 @@ public class Player {
         double degrees = Math.toDegrees(Math.atan2(yDistance, xDistance));
         rotation = Math.toRadians (degrees+90);
         rotationDegrees = degrees;
-        //System.out.println(degrees);
+
     }
 
     public void movePlayer(String direction) {
@@ -141,7 +140,6 @@ public class Player {
     }
 
     public void fireWeapon() {
-
         bullets.add(new Bullet(playerXonMap,playerYonMap,rotationDegrees,0)); //add new bullet
     }
 
