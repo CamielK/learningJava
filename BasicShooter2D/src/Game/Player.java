@@ -15,10 +15,12 @@ import java.util.List;
  */
 public class Player {
 
-    public int playerXonMap = 568, playerYonMap = 468;
+    public int playerXonMap = 1268, playerYonMap = 1168;
     public final int playerXonScreen = 568, playerYonScreen = 468;
     public double rotation = Math.toRadians (90);
     public double rotationDegrees = 90;
+
+
     private int movementSpeed = 3;
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
@@ -118,6 +120,14 @@ public class Player {
         rotation = Math.toRadians (degrees+90);
         rotationDegrees = degrees;
 
+    }
+
+    public Point getLocation() {
+        return new Point(playerXonMap, playerYonMap);
+    }
+
+    public int getMovementSpeed() {
+        return movementSpeed;
     }
 
     public void movePlayer(String direction) {
