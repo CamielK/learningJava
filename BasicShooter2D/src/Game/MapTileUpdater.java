@@ -15,26 +15,31 @@ public class MapTileUpdater {
     //TODO: outer tiles should not be updated
 
     //generates and updates list of map tiles
-    private int horizontalMaxTiles = 250, verticalMaxTiles = 250; //map size = 2500x2500
-    private int tileSize = 10; //tile size = 10x10
-
-    private final String backgroundFileName = "Resources/blockMap.png";
+    private int mapSizeX, mapSizeY, tileSize, horizontalMaxTiles, verticalMaxTiles;
+    private final String blockMapFileName;
     private BufferedImage blockMap;
+    private static List<MapTile> mapTiles = new ArrayList<MapTile>();
 
-    private List<MapTile> mapTiles = new ArrayList<MapTile>();
+    public MapTileUpdater(int mapSizeX, int mapSizeY, int tileSize, String blockMapFileName) {
+        this.mapSizeX = mapSizeX;
+        this.mapSizeY = mapSizeY;
+        this.tileSize = tileSize;
+        this.horizontalMaxTiles = mapSizeX / tileSize;
+        this.verticalMaxTiles = mapSizeY / tileSize;
+        this.blockMapFileName = blockMapFileName;
+    }
 
     public void generateMapTileList() {
-
         //load blockMap image to generate blocked pixels.
         //red rgb = blocked, blue rgb = transparent, green rgb = empty
-        URL imgUrl = getClass().getClassLoader().getResource(backgroundFileName);
-        if (imgUrl == null) { System.err.println("Couldn't find file: " + backgroundFileName); }
+        URL imgUrlBlockMap = getClass().getClassLoader().getResource(blockMapFileName);
+        if (imgUrlBlockMap == null) { System.err.println("Couldn't find file: " + blockMapFileName); }
         else {
-            try { blockMap = ImageIO.read(imgUrl); } catch (IOException ex) { ex.printStackTrace(); }
+            try { blockMap = ImageIO.read(imgUrlBlockMap); } catch (IOException ex) { ex.printStackTrace(); }
         }
 
         //fill initial list
-        int x1=0, y1=0, x2=10, y2=10; //first tile
+        int x1=0, y1=0, x2=tileSize, y2=tileSize; //first tile
         for (int i=1; i <= verticalMaxTiles; i++) {
             for (int k=1; k <= horizontalMaxTiles; k++) {
                 String status = "empty";
@@ -55,19 +60,16 @@ public class MapTileUpdater {
                 x1 += tileSize; x2 +=tileSize;
             }
             y1 += tileSize; y2 += tileSize;
-            x1 = 0; x2 = 10;
-
+            x1 = 0; x2 = tileSize;
         }
     }
-
 
     public List<MapTile> getMapTilesList() {
         return mapTiles;
     }
 
-
-    public void setTileStatus(Point objectLocation, String objectType) {
-        // object type can be a player or NPC. this is used to identify the size of the object
+    public void setTileStatus(Point objectLocationP1, Point objectLocationP2, String status) {
+        // object type can be a player or Terrorist. this is used to identify the size of the object
     }
 
 

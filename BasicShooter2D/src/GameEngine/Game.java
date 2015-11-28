@@ -27,6 +27,7 @@ public class Game {
         window.addKeyListener(keyboardListener);
         window.addMouseListener(mousepadListener);
 
+
         new Thread(gameThread).start();
     }
 

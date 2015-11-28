@@ -48,8 +48,8 @@ public class GameGUI {
         //g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //raster line
 
         //minimap
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(950, 0, 250,250);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(955, 0, 245,245);
         g2d.drawImage(background, 950, 0, 1200, 250, srcX1, srcY1, srcX2, srcY2, null);
 
         //GUI
