@@ -25,12 +25,13 @@ public class Player {
     private int movementSpeed = 3;
 
     private List<Bullet> bullets = new ArrayList<Bullet>();
-    private int maxBulletLifetime = 500;
+    private int maxBulletLifetime = 100;
     private int bulletSpeed = 5;
     private int counter = 0;
 
     //player image creation:
-    private final String playerFileName = "Resources/player.png";
+    //private final String playerFileName = "Resources/player.png";
+    private final String playerFileName = "Resources/player1.png";
     private BufferedImage playerImg;
     public Player(){
         URL imgUrl = getClass().getClassLoader().getResource(playerFileName);
@@ -102,7 +103,8 @@ public class Player {
 
         //check for end of lifetime on bullets
         for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
-            if (iter.next().getLifetime() >= maxBulletLifetime) {
+            int iterLifetime = iter.next().getLifetime();
+            if (iterLifetime >= maxBulletLifetime) {
                 iter.remove();
             }
         }
@@ -124,7 +126,7 @@ public class Player {
         double xDistance = mouseLocation.getX() - center.getX();
         double yDistance = mouseLocation.getY() - center.getY();
         double degrees = Math.toDegrees(Math.atan2(yDistance, xDistance));
-        rotation = Math.toRadians (degrees+90);
+        rotation = Math.toRadians (degrees);
         rotationDegrees = degrees;
 
     }
@@ -161,7 +163,7 @@ public class Player {
     }
 
     public void fireWeapon() {
-        bullets.add(new Bullet(playerXonMap,playerYonMap,rotationDegrees,0)); //add new bullet
+        bullets.add(new Bullet(playerXonMap+32,playerYonMap+32,rotationDegrees,0)); //add new bullet
     }
 
 }
