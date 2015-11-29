@@ -23,11 +23,11 @@ public class Terrorist {
 
     private MapTileUpdater mapTileUpdater;
 
-    public Terrorist(int spawnXcor, int spawnYcor) {
-        this.x1CorOnMap = spawnXcor;
-        this.y1CorOnMap = spawnYcor;
-        this.x2CorOnMap = spawnXcor + 64;
-        this.y2CorOnMap = spawnYcor + 64;
+    public Terrorist(Point spawnPoint) {
+        this.x1CorOnMap = spawnPoint.x;
+        this.y1CorOnMap = spawnPoint.y;
+        this.x2CorOnMap = spawnPoint.x + 64;
+        this.y2CorOnMap = spawnPoint.y + 64;
 
 
         URL imgUrl = getClass().getClassLoader().getResource(terroristFileName);

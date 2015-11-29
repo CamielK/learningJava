@@ -32,9 +32,9 @@ public class MapTile {
         return P2;
     }
 
-    public boolean tileContains(Point location) {
+    public boolean tileContains(Rectangle r) {
         //check if location is inside tile
-        return (location.x >= x1 && location.x <= x2 && location.y >= y1 && location.y <= y2);
+        return (x1 < r.x + r.width)     && (x1 + (x2-x1) > r.x)     && (y1 < r.y + r.height)    && (y1 + (y2-y1) > r.y);
     }
 
     public String getStatus() {

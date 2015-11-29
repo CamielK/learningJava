@@ -18,6 +18,7 @@ public class Player {
     public int playerXonMap = 1268, playerYonMap = 1168;
     public final int playerXonScreen = 568, playerYonScreen = 468;
     public double rotation = Math.toRadians (90);
+    public String orientation = "right";
     public double rotationDegrees = 90;
 
 
@@ -106,10 +107,16 @@ public class Player {
             }
         }
 
+
         //draw player
+//        if (orientation.equals("up")) {rotation = Math.toRadians (0);}
+//        else if (orientation.equals("down")) {rotation = Math.toRadians (180);}
+//        else if (orientation.equals("right")) {rotation = Math.toRadians (90);}
+//        else if (orientation.equals("left")) {rotation = Math.toRadians (270);}
         AffineTransform tx = AffineTransform.getRotateInstance(rotation, 32, 32);
         AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
         g2d.drawImage(op.filter(playerImg, null), playerXonScreen, playerYonScreen, null);
+        g2d.drawRect(playerXonScreen, playerYonScreen, 64, 64);
     }
 
     public void setRotation (Point mouseLocation) { //calculate angle mouseLocation from center
@@ -134,15 +141,19 @@ public class Player {
         switch (direction) {
             case "Up":
                 playerYonMap -= movementSpeed;
+                orientation = "up";
                 break;
             case "Down":
                 playerYonMap += movementSpeed;
+                orientation = "down";
                 break;
             case "Left":
                 playerXonMap -= movementSpeed;
+                orientation = "left";
                 break;
             case "Right":
                 playerXonMap += movementSpeed;
+                orientation = "right";
                 break;
             default:
                 break;

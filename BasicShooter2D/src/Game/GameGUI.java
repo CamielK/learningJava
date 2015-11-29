@@ -11,7 +11,8 @@ import java.net.URL;
 public class GameGUI {
 
     //background:
-    private final String backgroundFileName = "Resources/bgMap.png";
+    //private final String backgroundFileName = "Resources/blockMap.png"; //regular map
+    private final String backgroundFileName = "Resources/bgMap.png"; //blocked area map
     private Image background;
     private final String guiFileName = "Resources/GUI.png";
     private Image gui;
@@ -44,8 +45,8 @@ public class GameGUI {
 
     public void drawGUI (Graphics2D g2d) {
         //background
-        g2d.drawImage(background, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //map
-        //g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //raster line
+        g2d.drawImage(background, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //draw map
+        g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //draw raster lines
 
         //minimap
         g2d.setColor(Color.BLACK);

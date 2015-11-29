@@ -24,10 +24,12 @@ public class GameUpdater extends Screen {
     private int fireCooldown = firerate; //countdown for new bullet
     private boolean firing = false;
 
-    private MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, 10, "Resources/blockMap.png");
+    private MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, 5, "Resources/blockMap.png");
     private List<MapTile> mapTiles;
 
-    private Terrorist terrorist = new Terrorist(1000,1000);
+    private Terrorist terrorist;
+
+    private MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
 
 
     @Override
@@ -68,7 +70,10 @@ public class GameUpdater extends Screen {
     public void onDraw(Graphics2D g2d) {
         gui.drawGUI(g2d);
         player.drawPlayer(g2d);
-        terrorist.drawTerrorist(g2d);
+
+        Point spawnPoint = mapCoordinateTranslator.getScreenPoint(new Point(1200,1200));
+        if (spawnPoint != null) { terrorist = new Terrorist(spawnPoint); }
+        if (terrorist != null) { terrorist.drawTerrorist(g2d); }
     }
 
     private void shoot () {
@@ -84,6 +89,7 @@ public class GameUpdater extends Screen {
         if (!collision("Up")) {
             player.movePlayer("Up");
             gui.moveBackground("Up");
+            mapCoordinateTranslator.updateDisplayedMapResolution("up");
         }
     }
 
@@ -91,6 +97,7 @@ public class GameUpdater extends Screen {
         if (!collision("Down")) {
             player.movePlayer("Down");
             gui.moveBackground("Down");
+            mapCoordinateTranslator.updateDisplayedMapResolution("Down");
         }
     }
 
@@ -98,6 +105,7 @@ public class GameUpdater extends Screen {
         if (!collision("Left")) {
             player.movePlayer("Left");
             gui.moveBackground("Left");
+            mapCoordinateTranslator.updateDisplayedMapResolution("Left");
         }
     }
 
@@ -105,6 +113,7 @@ public class GameUpdater extends Screen {
         if (!collision("Right")) {
             player.movePlayer("Right");
             gui.moveBackground("Right");
+            mapCoordinateTranslator.updateDisplayedMapResolution("Right");
         }
     }
 
@@ -112,20 +121,21 @@ public class GameUpdater extends Screen {
         boolean collided = false;
         playerLocataion = player.getLocation();
         int movespeed = player.getMovementSpeed();
-        Point nextLocationBorder = new Point(playerLocataion.x, playerLocataion.y);
+        Point nextLocation = new Point(playerLocataion.x, playerLocataion.y);
+
 
         switch (direction) {
             case "Up":
-                nextLocationBorder.y -= movespeed;
+                nextLocation.y -= movespeed;
                 break;
             case "Down":
-                nextLocationBorder.y += (movespeed + 64);
+                nextLocation.y += movespeed;
                 break;
             case "Left":
-                nextLocationBorder.x -= movespeed;
+                nextLocation.x -= movespeed;
                 break;
             case "Right":
-                nextLocationBorder.x += (movespeed + 64);
+                nextLocation.x += movespeed;
                 break;
             default:
                 break;
@@ -133,7 +143,7 @@ public class GameUpdater extends Screen {
 
         for (int i = 0; i < mapTiles.size(); i++) {
             MapTile currentTile = mapTiles.get(i);
-            if (currentTile.tileContains(nextLocationBorder) && currentTile.getStatus().equals("blocked")) {
+            if (currentTile.tileContains(new Rectangle(nextLocation.x, nextLocation.y, 64, 64)) && currentTile.getStatus().equals("blocked")) {
                 collided = true;
                 i = mapTiles.size();
             }
