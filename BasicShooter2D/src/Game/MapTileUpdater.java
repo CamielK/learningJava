@@ -72,7 +72,48 @@ public class MapTileUpdater {
 
     }
 
+    public List<Integer> getMapTileIndexes(Rectangle object) {
+
+        int objectP1Index = getMapTileIndex(new Point( (int) object.getX(), (int) object.getY()));
+        int objectP2Index = getMapTileIndex(new Point( (int) (object.getX() + object.getWidth()), (int) (object.getY() + object.getHeight())));
 
 
+        //get a list of maptile indexes for all tiles between P1 and P2
+        List<Integer> mapTileIndexes = new ArrayList<Integer>();
 
+        //get horizontal and vertical delta's
+        int deltaX = (objectP2Index%(mapSizeX/tileSize)) - (objectP1Index%(mapSizeX/tileSize)); //ammount of horizontal tiles between P1 and P2
+        int deltaY = ((objectP2Index-deltaX) - (objectP1Index)) / (mapSizeX/tileSize); //ammount of rows betweeen P1 and P2
+
+        //calculate all maptile indexes and add them to the list
+        int i = objectP1Index;
+        int x = deltaX;
+        int y = deltaY;
+        while (i <= objectP2Index) {
+            mapTileIndexes.add(i); //add tile to list
+
+            //calculate next tile:
+            if (x > 0) { i++; x--; }
+            else if (y > 0) {//jump to next row when delta X are depleted, reset delta X counter
+                i += (mapSizeX/tileSize);
+                i -= deltaX;
+                y--;
+                x = deltaX;
+            }
+            else {
+                i++;
+            }
+
+        }
+
+        return mapTileIndexes;
+    }
+
+    private int getMapTileIndex(Point objectPoint) {
+        //returns index of maptile that matches the objects P1
+        double tileX = objectPoint.getX() / tileSize;
+        double tileRow = objectPoint.getY() / tileSize;
+
+        return (int) ((((int) tileRow) * (mapSizeX/tileSize)) + tileX);
+    }
 }

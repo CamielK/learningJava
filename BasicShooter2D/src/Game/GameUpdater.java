@@ -20,7 +20,7 @@ public class GameUpdater extends Screen {
     private Point playerLocataion;
 
     //firing
-    private int firerate = 15; //4 per second
+    private int firerate = 5; //= 12 per second = 720/min
     private int fireCooldown = firerate; //countdown for new bullet
     private boolean firing = false;
 
@@ -62,6 +62,7 @@ public class GameUpdater extends Screen {
         //TODO: enable mouse for shooting instead of spacebar
         //if (getScreenFactory().getGame().getMousepadListener().isMousePressed()) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
+        if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_R)) { player.reloadWeapon(); }
 
         player.updatePlayer();
     }

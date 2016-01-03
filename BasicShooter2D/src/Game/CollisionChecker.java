@@ -1,6 +1,7 @@
 package Game;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,12 +12,17 @@ import java.util.List;
  */
 public class CollisionChecker {
 
-    private MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, 5, "Resources/blockMap.png");
-    private List<MapTile> mapTiles;
+    private static int tileSize = 5;
+    private static MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, tileSize, "Resources/blockMap.png");
+    private static List<MapTile> mapTiles;
+    private static boolean generated = false;
 
     public CollisionChecker () {
-        mapTileUpdater.generateMapTileList(); // generate map tiles
-        mapTiles = mapTileUpdater.getMapTilesList();
+        if (!generated) {
+            mapTileUpdater.generateMapTileList(); // generate map tiles
+            mapTiles = mapTileUpdater.getMapTilesList();
+            generated = true;
+        }
     }
 
     public String getCollision(Point objectP1, Point objectP2) {
@@ -38,18 +44,21 @@ public class CollisionChecker {
 
     public boolean blockMapCollision(Rectangle object) {
         //checks if object (rectangle) collides with blocked tiles
-
         boolean collided = false;
-        for (int i = 0; i < mapTiles.size(); i++) { //loop all map tiles to check for collisions.
-            //TODO only check local tiles instead of entire tile map
-            // translate location to mapTiles index??
-            // get all nearby tiles, check if they are blocked.
-            MapTile currentTile = mapTiles.get(i);
-            if (currentTile.tileContains(object) && currentTile.getStatus().equals("blocked")) {
+
+        //get list of all maptile indexes that contain the object
+        List<Integer> mapTileIndexes = mapTileUpdater.getMapTileIndexes(object);
+
+        //loop list to check blockmap
+        for (int i = 0; i < mapTileIndexes.size(); i++) { //loop all map tiles to check for collisions.
+            int currentIndex = mapTileIndexes.get(i);
+            MapTile currentTile = mapTiles.get(currentIndex);
+            if (currentTile.getStatus().equals("blocked")) {
                 collided = true;
                 i = mapTiles.size();
             }
         }
+
         return collided;
     }
 }

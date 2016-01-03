@@ -12,9 +12,10 @@ public class Bullet {
     private double bulletY;
     private double bulletDirection;
     private int lifetime;
-    private int maxBulletLifetime = 200;
-    private int bulletSpeed = 15;
+    private int maxBulletLifetime = 90; //1,5 seconds
+    private int bulletSpeed = 20;
     private boolean expiredStatus = false;
+    private static CollisionChecker collisionChecker = new CollisionChecker();
 
     public Bullet(int bulletX, int bulletY, double bulletDirection, int lifetime) {
         this.bulletX = bulletX;
@@ -100,17 +101,17 @@ public class Bullet {
             bulletY -= (bulletSpeed * yMovePercentage);
             bulletDirection -= 90;
         }
+
+
+
+        boolean collision = false;
+        collision = collisionChecker.blockMapCollision(new Rectangle((int) bulletX - 5, (int) bulletY - 5, 15, 15)); //bullets are 5x5, this checks for the 15x15 area around the bullet
+        if (collision) {
+            expiredStatus = true;
+        }
     }
 
     public boolean isExpired() {
         return expiredStatus;
     }
-
-//    //check for end of lifetime on bullets
-//    for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
-//        int iterLifetime = iter.next().getLifetime();
-//        if (iterLifetime >= maxBulletLifetime) {
-//            iter.remove();
-//        }
-//    }
 }

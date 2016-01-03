@@ -65,7 +65,7 @@ public class GameThread extends JPanel implements Runnable{
 
     public void paint(Graphics g) {
         //uncomment to limit framerate
-        try { Thread.sleep(2); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
         frames++;
 
         super.paint(g);

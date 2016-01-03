@@ -15,17 +15,27 @@ import java.util.List;
  */
 public class Player {
 
-    public int playerXonMap = 1268, playerYonMap = 1168;
-    public final int playerXonScreen = 568, playerYonScreen = 468;
-    public double rotation = Math.toRadians (90);
-    public String orientation = "right";
-    public double rotationDegrees = 90;
-
+    //########## player variables ##########
+    //player logic:
+    private int playerXonMap = 1268, playerYonMap = 1168;
+    private final int playerXonScreen = 568, playerYonScreen = 468;
+    private double rotation = Math.toRadians (90);
+    private String orientation = "right";
+    private double rotationDegrees = 90;
     private int movementSpeed = 3;
 
-    private List<Bullet> bullets = new ArrayList<Bullet>();
+    //ammunitions:
+    private static int totalBullets = 300;
+    private final static int clipSize = 30;
+    private static int currentClip = 30;
+    private boolean reloading = false;
 
-    //player image creation:
+    //bullets
+    private List<Bullet> bullets = new ArrayList<Bullet>();
+    private static boolean updatingBullets = false;
+    private static boolean paintingBullets = false;
+
+    //load player image:
     //private final String playerFileName = "Resources/player.png";
     private final String playerFileName = "Resources/player1.png";
     private BufferedImage playerImg;
@@ -36,17 +46,24 @@ public class Player {
             try { playerImg = ImageIO.read(imgUrl); } catch (IOException ex) { ex.printStackTrace(); }
         }
     }
+    //########## end of variables ##########
+
+
     public void drawPlayer (Graphics2D g2d) {
         //minimap player:
         g2d.fillRect(1070,120,10,10);
 
-        //draw and update bullets
-        for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
-            Bullet bullet = iter.next();
-            bullet.drawBullet(g2d, playerXonMap - 568, playerYonMap - 468);
-            if (bullet.isExpired()) {
-                iter.remove();
+        //draw bullets
+        if (!updatingBullets) {
+            paintingBullets = true;
+            for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
+                Bullet bullet = iter.next();
+                bullet.drawBullet(g2d, playerXonMap - 568, playerYonMap - 468);
             }
+            paintingBullets = false;
+        }
+        else {
+            System.out.println("Could not paint bullets. (bullets are being updated)");
         }
 
         //draw player
@@ -54,12 +71,39 @@ public class Player {
         AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
         g2d.drawImage(op.filter(playerImg, null), playerXonScreen, playerYonScreen, null);
         g2d.drawRect(playerXonScreen, playerYonScreen, 64, 64);
+
+        //ammunition:
+        g2d.drawString("Ammo: "+Integer.toString(currentClip)+" / "+totalBullets,50,950);
+        if (totalBullets == 0) {
+            g2d.drawString("You are out of ammo!",550,550);
+        }
+        else if (currentClip == 0) {
+            g2d.drawString("You need to reload! (R)",550,550);
+        }
+
+        //reload
+        if (reloading) {
+            reloading = false;
+            //TODO implement reload animation here
+        }
+
     }
 
     public void updatePlayer() {
         //update bullets
-        for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
-            iter.next().updateBullet();
+        if (!paintingBullets) {
+            updatingBullets = true;
+            for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
+                Bullet bullet = iter.next();
+                bullet.updateBullet();
+                if (bullet.isExpired()) {
+                    iter.remove();
+                }
+            }
+            updatingBullets = false;
+        }
+        else {
+            System.out.println("Could not update bullets. (bullets are being painted)");
         }
     }
 
@@ -106,8 +150,29 @@ public class Player {
     }
 
     public void fireWeapon() {
-        bullets.add(new Bullet(playerXonMap+32,playerYonMap+32,rotationDegrees,0)); //add new bullet
+        if (!updatingBullets && !paintingBullets && currentClip > 0) {
+            bullets.add(new Bullet(playerXonMap+32,playerYonMap+32,rotationDegrees,0)); //add new bullet
+            currentClip--;
+        }
+        else if (currentClip == 0) {
+            System.out.println("Could not add bullet. empty clip!");
+        }
+        else {
+            System.out.println("Could not add bullet. (bullets are being painted or updated)");
+        }
     }
 
+    public void reloadWeapon() {
+        reloading = true;
+        totalBullets += currentClip;
+        if (totalBullets >= clipSize) {
+            currentClip = clipSize;
+            totalBullets -= clipSize;
+        }
+        else {
+            currentClip = totalBullets;
+            totalBullets = 0;
+        }
+    }
 
 }
