@@ -7,7 +7,10 @@ import java.awt.*;
  */
 public class MapCoordinateTranslator {
 
-    private int movementSpeed = 3;
+    //import global settings
+    private GlobalSettings settings = new GlobalSettings();
+    private int movementSpeed = settings.getMovespeed();
+
     private int screenX1 = 0, screenY1 = 0, screenX2 = 1200, screenY2 = 1000; //screen resolution
     private static int mapX1 = 700, mapY1 = 700, mapX2 = 1900, mapY2 = 1700; //displayed part of map
 
@@ -29,6 +32,8 @@ public class MapCoordinateTranslator {
     }
 
     public void updateDisplayedMapResolution(String direction) {
+        movementSpeed = settings.getMovespeed();
+
         switch (direction) {
             case "Up":
                 mapY1 -= movementSpeed;

@@ -12,13 +12,19 @@ import java.util.List;
  */
 public class CollisionChecker {
 
-    private static int tileSize = 5;
-    private static MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, tileSize, "Resources/blockMap.png");
+    //import global settings
+    private static GlobalSettings settings = new GlobalSettings();
+    private static int mapSizeX = settings.getMapSizeX();
+    private static int mapSizeY = settings.getMapSizeY();
+    private static int tileSize = settings.getTileSize();
+
+    private static MapTileUpdater mapTileUpdater;
     private static List<MapTile> mapTiles;
     private static boolean generated = false;
 
     public CollisionChecker () {
         if (!generated) {
+            mapTileUpdater = new MapTileUpdater(mapSizeX, mapSizeY, tileSize, "Resources/blockMap.png");
             mapTileUpdater.generateMapTileList(); // generate map tiles
             mapTiles = mapTileUpdater.getMapTilesList();
             generated = true;

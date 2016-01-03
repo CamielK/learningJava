@@ -10,6 +10,10 @@ import java.net.URL;
  */
 public class GameGUI {
 
+    //import global settings
+    private GlobalSettings settings = new GlobalSettings();
+    private int movementSpeed = settings.getMovespeed();
+
     //background:
     //private final String backgroundFileName = "Resources/blockMap.png"; //regular map
     private final String backgroundFileName = "Resources/bgMap.png"; //blocked area map
@@ -19,8 +23,7 @@ public class GameGUI {
     private final String backgroundTemplateFileName = "Resources/bgMapTemplate.png";
     private Image backgroundTemplate;
     static int srcX1 = 700, srcY1 = 700, srcX2 = 1900, srcY2 = 1700; // default source window of background
-    static final int destX1 = 0, destY1 = 0, destX2 = 1200, destY2 = 1000; // destination coordiantes of background
-    private int movementSpeed = 3;
+    static final int destX1 = 0, destY1 = 0, destX2 = 1200, destY2 = 1000; // destination coordiantes of backgrounda
 
 
     public GameGUI(){
@@ -60,6 +63,8 @@ public class GameGUI {
     }
 
     public void moveBackground(String direction) {
+        movementSpeed = settings.getMovespeed();
+
         switch (direction) {
             case "Up":
                 srcY1 -= movementSpeed; srcY2 -= movementSpeed;

@@ -11,10 +11,13 @@ import java.net.URL;
  */
 public class Terrorist {
 
+    //import global settings
+    private GlobalSettings settings = new GlobalSettings();
+    private int movementSpeed = settings.getMovespeed();
+
     private String name;
     private int x1CorOnMap, y1CorOnMap, x2CorOnMap, y2CorOnMap;
     private int x1CorOnScreen, y1CorOnScreen;
-    private int movementSpeed = 4;
 
     private static int uniqueTerroristID = 0;
 
@@ -55,6 +58,8 @@ public class Terrorist {
     }
 
     public void moveTerrorist(String direction) {
+        movementSpeed = settings.getMovespeed();
+
         mapTileUpdater.setTileStatus(new Point (x1CorOnMap, y1CorOnMap), new Point (x2CorOnMap, y2CorOnMap), "empty"); //clear old location
         switch (direction) {
             case "Up":

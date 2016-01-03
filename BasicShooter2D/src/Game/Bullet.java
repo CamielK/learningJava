@@ -12,8 +12,8 @@ public class Bullet {
     private double bulletY;
     private double bulletDirection;
     private int lifetime;
-    private int maxBulletLifetime = 90; //1,5 seconds
-    private int bulletSpeed = 20;
+    private int maxBulletLifetime = 45; //0.75 seconds
+    private int bulletSpeed = 40;
     private boolean expiredStatus = false;
     private static CollisionChecker collisionChecker = new CollisionChecker();
 

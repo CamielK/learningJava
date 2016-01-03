@@ -12,6 +12,9 @@ import java.util.List;
  */
 public class GameUpdater extends Screen {
 
+    //import global settings
+    private GlobalSettings settings = new GlobalSettings();
+
     public GameUpdater(ScreenFactory screenFactory) {
         super(screenFactory);
     }
@@ -63,6 +66,10 @@ public class GameUpdater extends Screen {
         //if (getScreenFactory().getGame().getMousepadListener().isMousePressed()) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_R)) { player.reloadWeapon(); }
+
+        //running adjust speed:
+        if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SHIFT)) { settings.setRunSpeed(); }
+        else { settings.setWalkSpeed(); }
 
         player.updatePlayer();
     }

@@ -16,13 +16,17 @@ import java.util.List;
 public class Player {
 
     //########## player variables ##########
+    //import global settings
+    private GlobalSettings settings = new GlobalSettings();
+
     //player logic:
     private int playerXonMap = 1268, playerYonMap = 1168;
     private final int playerXonScreen = 568, playerYonScreen = 468;
     private double rotation = Math.toRadians (90);
     private String orientation = "right";
     private double rotationDegrees = 90;
-    private int movementSpeed = 3;
+    private int movementSpeed = settings.getMovespeed();
+    private boolean running = false;
 
     //ammunitions:
     private static int totalBullets = 300;
@@ -90,7 +94,7 @@ public class Player {
     }
 
     public void updatePlayer() {
-        //update bullets
+        //update bullet
         if (!paintingBullets) {
             updatingBullets = true;
             for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
@@ -127,6 +131,8 @@ public class Player {
     }
 
     public void movePlayer(String direction) {
+        movementSpeed = settings.getMovespeed();
+
         switch (direction) {
             case "Up":
                 playerYonMap -= movementSpeed;
