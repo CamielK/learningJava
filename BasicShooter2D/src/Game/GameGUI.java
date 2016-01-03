@@ -46,7 +46,7 @@ public class GameGUI {
     public void drawGUI (Graphics2D g2d) {
         //background
         g2d.drawImage(background, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //draw map
-        g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //draw raster lines
+        //g2d.drawImage(backgroundTemplate, destX1, destY1, destX2, destY2, srcX1, srcY1, srcX2, srcY2, null); //draw raster lines
 
         //minimap
         g2d.setColor(Color.BLACK);

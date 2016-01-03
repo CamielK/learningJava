@@ -22,12 +22,15 @@ public class Terrorist {
     private BufferedImage terroristImg;
 
     private MapTileUpdater mapTileUpdater;
+    private MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
 
     public Terrorist(Point spawnPoint) {
+
         this.x1CorOnMap = spawnPoint.x;
         this.y1CorOnMap = spawnPoint.y;
         this.x2CorOnMap = spawnPoint.x + 64;
         this.y2CorOnMap = spawnPoint.y + 64;
+        System.out.println("new terrorist spawned at: " + x1CorOnMap + ", " + y1CorOnMap);
 
 
         URL imgUrl = getClass().getClassLoader().getResource(terroristFileName);
@@ -38,7 +41,9 @@ public class Terrorist {
     }
 
     public void drawTerrorist(Graphics2D g2d) {
-        g2d.fillRect(x1CorOnMap, y1CorOnMap, 64, 64);
+        Point drawPoint = mapCoordinateTranslator.getScreenPoint(new Point(x1CorOnMap,y1CorOnMap)); //get current screen loc
+        g2d.fillRect(drawPoint.x, drawPoint.y, 64, 64);
+        //System.out.println(drawPoint.x + ", " + drawPoint.y);
     }
 
     public Point getP1LocationOnMap() {

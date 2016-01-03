@@ -18,9 +18,9 @@ public class SpriteSheet {
     public SpriteSheet(String path) {
         BufferedImage image = null;
         try {
-            image = ImageIO.read(getClass().getClassLoader().getResource(path));
+            //image = ImageIO.read(getClass().getClassLoader().getResource(path));
             //getClass().getClassLoader().getResource(
-            //image = ImageIO.read(SpriteSheet.class.getResourceAsStream(path));
+            image = ImageIO.read(SpriteSheet.class.getResourceAsStream(path));
         } catch (IOException e) {
             e.printStackTrace();
         }

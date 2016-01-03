@@ -69,7 +69,7 @@ public class MapTileUpdater {
     }
 
     public void setTileStatus(Point objectLocationP1, Point objectLocationP2, String status) {
-        // object type can be a player or Terrorist. this is used to identify the size of the object
+
     }
 
 

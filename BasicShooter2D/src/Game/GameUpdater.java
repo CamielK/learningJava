@@ -20,12 +20,11 @@ public class GameUpdater extends Screen {
     private Point playerLocataion;
 
     //firing
-    private int firerate = 25; //4 per second
+    private int firerate = 15; //4 per second
     private int fireCooldown = firerate; //countdown for new bullet
     private boolean firing = false;
 
-    private MapTileUpdater mapTileUpdater = new MapTileUpdater(2500, 2500, 5, "Resources/blockMap.png");
-    private List<MapTile> mapTiles;
+    private CollisionChecker collisionChecker;
 
     private Terrorist terrorist;
 
@@ -35,8 +34,12 @@ public class GameUpdater extends Screen {
     @Override
     public void onCreate() {
         System.out.println("Creating!");
-        mapTileUpdater.generateMapTileList(); // generate map tiles
-        mapTiles = mapTileUpdater.getMapTilesList();
+
+        collisionChecker = new CollisionChecker();
+
+        //Point spawnPoint = mapCoordinateTranslator.getScreenPoint(new Point(1200,1200));
+        terrorist = new Terrorist(new Point(1200,1200));
+
     }
 
     @Override
@@ -48,13 +51,8 @@ public class GameUpdater extends Screen {
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_S)) { moveDown(); }
 
         //update fire cooldown
-        if (fireCooldown >= firerate) {
-            firing = false;
-        }
-        else if (fireCooldown < firerate) {
-            fireCooldown++;
-            firing = true;
-        }
+        if (fireCooldown >= firerate) { firing = false; }
+        else if (fireCooldown < firerate) { fireCooldown++; firing = true; }
 
         //set player direction pointing towards mouse
         Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
@@ -64,6 +62,8 @@ public class GameUpdater extends Screen {
         //TODO: enable mouse for shooting instead of spacebar
         //if (getScreenFactory().getGame().getMousepadListener().isMousePressed()) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
+
+        player.updatePlayer();
     }
 
     @Override
@@ -71,8 +71,6 @@ public class GameUpdater extends Screen {
         gui.drawGUI(g2d);
         player.drawPlayer(g2d);
 
-        Point spawnPoint = mapCoordinateTranslator.getScreenPoint(new Point(1200,1200));
-        if (spawnPoint != null) { terrorist = new Terrorist(spawnPoint); }
         if (terrorist != null) { terrorist.drawTerrorist(g2d); }
     }
 
@@ -89,7 +87,7 @@ public class GameUpdater extends Screen {
         if (!collision("Up")) {
             player.movePlayer("Up");
             gui.moveBackground("Up");
-            mapCoordinateTranslator.updateDisplayedMapResolution("up");
+            mapCoordinateTranslator.updateDisplayedMapResolution("Up");
         }
     }
 
@@ -123,7 +121,7 @@ public class GameUpdater extends Screen {
         int movespeed = player.getMovementSpeed();
         Point nextLocation = new Point(playerLocataion.x, playerLocataion.y);
 
-
+        //calculate next position
         switch (direction) {
             case "Up":
                 nextLocation.y -= movespeed;
@@ -141,14 +139,7 @@ public class GameUpdater extends Screen {
                 break;
         }
 
-        for (int i = 0; i < mapTiles.size(); i++) {
-            MapTile currentTile = mapTiles.get(i);
-            if (currentTile.tileContains(new Rectangle(nextLocation.x, nextLocation.y, 64, 64)) && currentTile.getStatus().equals("blocked")) {
-                collided = true;
-                i = mapTiles.size();
-            }
-        }
-
+        collided = collisionChecker.blockMapCollision(new Rectangle(nextLocation.x, nextLocation.y, 64, 64));
         return collided;
     }
 }
