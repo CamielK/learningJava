@@ -28,7 +28,7 @@ public class Animation {
     private static int feetSpriteIndex = 0, characterSpriteIndex = 0;
     private static int updateSpeed = 3, ticksSinceLastUpdate = 1; //wait 3 ticks for next sprite
     private static List<BufferedImage> feetImagesRunning = new ArrayList<BufferedImage>();
-    private static List<BufferedImage> playerImages = new ArrayList<BufferedImage>();
+    private static List<BufferedImage> playerShotgunImages = new ArrayList<BufferedImage>();
     private static BufferedImage playerImg, playerBox;
     private Player player = new Player();
 
@@ -40,11 +40,36 @@ public class Animation {
         //TODO bake image sources instead of recalculating every time?
         this.updateSpeed = updateSpeed;
 
-        //load 20 sprites of each image
-        for (int i = 0; i <= 19; i++) {
-            feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/walk/survivor-walk_" + i + ".png"));
-            playerImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/idle/survivor-idle_shotgun_" + i + ".png"));
+        //load all sprites
+        for (int i = 0; i <= 79; i++) {
+
+            if (i >= 0 && i <= 19) { //first 20 sprites
+                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/walk/survivor-walk_" + i + ".png")); // walk feet sprites
+                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/idle/survivor-idle_shotgun_" + i + ".png")); //idle shotgun sprites
+            }
+            else if (i >= 20 && i <= 39) { //second 20 sprites
+                int index = i - 20;
+                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/run/survivor-run_" + index + ".png")); // run feet sprites
+                if (index < 15) {playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/meleeattack/survivor-meleeattack_shotgun_" + index + ".png"));} // meleeattack shotgun sprites <<< lasts only 15 sprites
+                else { playerShotgunImages.add(null); } //add 5 nulls to make sure next set of sprites starts at 40
+            }
+            else if (i >= 40 && i <= 59) { //third 20 sprites
+                int index = i - 40;
+                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/strafe_left/survivor-strafe_left_" + index + ".png")); // strafe left feet sprites
+                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/move/survivor-move_shotgun_" + index + ".png")); //movement shotgun sprites
+            }
+            else if (i >= 60 && i <= 79) { //fourth 20 sprites
+                int index = i - 60;
+                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/strafe_right/survivor-strafe_right_" + index + ".png")); // strafe right feet sprites
+                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/reload/survivor-reload_shotgun_" + index + ".png")); //reload shotgun sprites
+            }
         }
+
+        // add last idle feet sprite at index 80
+        feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/idle/survivor-idle_0.png"));
+
+        // add last tree shoot sprites at index 80, 81 and 82
+        for (int i = 0; i < 3; i++) { playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/shoot/survivor-shoot_shotgun_" + i + ".png"));}
 
     }
 
@@ -102,7 +127,7 @@ public class Animation {
         //draws player image with calculated player sprite index
 
         if (characterSpriteIndex >= 0 && characterSpriteIndex <= 19) {
-            BufferedImage oldImg = playerImages.get(characterSpriteIndex);
+            BufferedImage oldImg = playerShotgunImages.get(characterSpriteIndex);
             BufferedImage newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 24);
 
             g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
@@ -113,7 +138,7 @@ public class Animation {
 
 
             //examples:
-            //new ImageConverter().convertImage(playerImagesIdle.get(characterSpriteIndex), 2.85, 124, 124, 20, 24);
+            //new ImageConverter().convertImage(playerShotgunImagesIdle.get(characterSpriteIndex), 2.85, 124, 124, 20, 24);
             //convertImage(oldFeetImg, 2.85, 124, 124, 20, (24+(83/2.85))) << converts old player sprite into new 124x124
 
 

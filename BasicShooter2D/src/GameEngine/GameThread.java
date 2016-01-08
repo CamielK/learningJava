@@ -1,7 +1,10 @@
 package GameEngine;
 
+import Game.Gfx.ImageLoader;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Created by Camiel on 21-Nov-15.
@@ -14,6 +17,9 @@ public class GameThread extends JPanel implements Runnable{
 
     int frames = 0;
 
+    private static BufferedImage loadingScreen, loadingDot;
+    private static long lastLoadUpdateTime = System.currentTimeMillis();
+
     public GameThread(Game game) {
         this.game = game;
         setFocusable(true);
@@ -22,6 +28,9 @@ public class GameThread extends JPanel implements Runnable{
 
     @Override
     public void run() {
+        loadingScreen = new ImageLoader().loadImage("Resources/loading.png");
+        loadingDot = new ImageLoader().loadImage("Resources/loadDot.png");
+
         long lastTime = System.nanoTime(); //save start time in nanoseconds since epoch
         double nsPerTick = 1000000000D/60D; //nano seconds per tick (60TPS)
 
@@ -61,6 +70,26 @@ public class GameThread extends JPanel implements Runnable{
 
     public void paint(Graphics g) {
 
+        frames++;
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        if (game.getScreenFactory().getCurrentScreen() != null) {
+            game.getScreenFactory().getCurrentScreen().onDraw(g2d);
+        }
+        else {
+            long timeDiff = System.currentTimeMillis() - lastLoadUpdateTime;
+            g2d.drawImage(loadingScreen , 0, 0, null); //loading screen
+            if (timeDiff >= 200) g2d.drawImage(loadingDot , 475, 700, null); //loading screen
+            if (timeDiff >= 400) g2d.drawImage(loadingDot , 575, 700, null); //loading screen
+            if (timeDiff >= 600) g2d.drawImage(loadingDot , 675, 700, null); //loading screen
+            if (timeDiff >= 800) lastLoadUpdateTime = System.currentTimeMillis();
+        }
+        repaint();
+
+
+
         //dynamicly limits sleeptime when performance drops
         int sleeptime = 6;
         if (lastFrameCount < 120) {sleeptime = 3;}
@@ -68,15 +97,8 @@ public class GameThread extends JPanel implements Runnable{
         else if (lastFrameCount < 60) {sleeptime = 0;}
         try { Thread.sleep(sleeptime); } catch (InterruptedException e) { e.printStackTrace(); }
 
-
-        frames++;
-        super.paint(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        if (game.getScreenFactory().getCurrentScreen() != null) {
-            game.getScreenFactory().getCurrentScreen().onDraw(g2d);
-        }
-        repaint();
     }
+
+
 
 }

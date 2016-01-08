@@ -22,36 +22,31 @@ public class Player {
     private static GlobalSettings settings = new GlobalSettings();
 
     //player logic:
-    //private int playerXonMap = 1268, playerYonMap = 1168;
-    //private final int playerXonScreen = 568, playerYonScreen = 468;
     private static final int playerXonScreen = settings.getPlayerXonScreen(), playerYonScreen = settings.getPlayerYonScreen();
     private static final int playerSize = settings.getPlayerSize();
     private static int playerXonMap = (1300 - (playerSize/2)), playerYonMap = (1200 - (playerSize/2));
 
+    //player animation
+    private static Animation animation = new Animation(2); //update every 3rd tick
     private static double rotation = Math.toRadians (90);
     private static String orientation = "right";
     private static double rotationDegrees = 90;
-    private int movementSpeed = settings.getMovespeed();
-    private boolean running = false;
+    private static int movementSpeed = settings.getMovespeed();
+    private static String moveStatus = "idle"; //for feet and character animation; can be idle, running, walking, strafing left or strafing right
+    private static String weaponStatus = "idle"; //for character animation; can be idle, shooting, reloading, knifing
+    private static String weaponType = "shotgun"; //for character animation; can be shotgun, rifle, knife, handgun or flashlight
 
-    //ammunitions:
+    //ammunition variables
     private static int totalBullets = 300;
     private final static int clipSize = 30;
     private static int currentClip = 30;
     private static boolean reloading = false;
 
-    //bullets
+    //bullet variables
     private static List<Bullet> bullets = new ArrayList<Bullet>();
     private static boolean updatingBullets = false;
     private static boolean paintingBullets = false;
-
-    private static SoundEngine soundEngine = new SoundEngine();
-    private static Animation animation = new Animation(2); //update every 3rd tick
-
-    //load player image:
-    private BufferedImage playerImg = new ImageLoader().loadImage("Resources/player3.png");
-    AffineTransform tx = AffineTransform.getRotateInstance(rotation, 64, 64);
-    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+    private static SoundEngine soundEngine = new SoundEngine(); //for bullet sound
 
     //########## end of variables ##########
 
@@ -77,10 +72,6 @@ public class Player {
         }
 
         animation.draw(g2d);
-
-        //draw player
-        //g2d.drawImage(op.filter(playerImg, null), playerXonScreen, playerYonScreen, null);
-        //g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);
 
         //ammunition:
         g2d.drawString("Ammo: "+Integer.toString(currentClip)+" / "+totalBullets,50,950);
@@ -128,21 +119,10 @@ public class Player {
         double degrees = Math.toDegrees(Math.atan2(yDistance, xDistance));
         rotation = Math.toRadians (degrees);
         rotationDegrees = degrees;
-
-        tx = AffineTransform.getRotateInstance(rotation, 64, 64);
-        op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
     }
 
     public double getRotation() {
         return rotation;
-    }
-
-    public Point getLocation() {
-        return new Point(playerXonMap, playerYonMap);
-    }
-
-    public int getMovementSpeed() {
-        return movementSpeed;
     }
 
     public void movePlayer(String direction) {
@@ -170,6 +150,10 @@ public class Player {
         }
     }
 
+    public Point getLocation() {
+        return new Point(playerXonMap, playerYonMap);
+    }
+
     public void fireWeapon() {
         if (!updatingBullets && !paintingBullets && currentClip > 0) {
             bullets.add(new Bullet(playerXonMap+(playerSize/2),playerYonMap+(playerSize/2),rotationDegrees,0)); //add new bullet
@@ -194,6 +178,22 @@ public class Player {
             currentClip = totalBullets;
             totalBullets = 0;
         }
+    }
+
+    public String getMoveStatus() {
+        return moveStatus;
+    }
+
+    public String getWeaponStatus(){
+        return weaponStatus;
+    }
+
+    public String getWeaponType() {
+        return weaponStatus;
+    }
+
+    public String getOrientation() {
+        return orientation;
     }
 
 }

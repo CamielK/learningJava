@@ -2,6 +2,7 @@ package Game;
 
 import Game.Audio.SoundEngine;
 import Game.Clouds.CloudFactory;
+import Game.Gfx.ImageLoader;
 import Game.Map.CollisionChecker;
 import Game.Map.MapCoordinateTranslator;
 import Game.Npcs.Terrorist;
@@ -20,6 +21,7 @@ public class GameUpdater extends Screen {
     //import global settings
     private GlobalSettings settings = new GlobalSettings();
     private final int playerSize = settings.getPlayerSize();
+    private int movespeed = settings.getMovespeed();
 
     public GameUpdater(ScreenFactory screenFactory) {
         super(screenFactory);
@@ -57,6 +59,7 @@ public class GameUpdater extends Screen {
 
         //generate initial clouds
         cloudFactory.fillField();
+
     }
 
     @Override
@@ -146,7 +149,7 @@ public class GameUpdater extends Screen {
     private boolean collision(String direction) {
         boolean collided = false;
         playerLocataion = player.getLocation();
-        int movespeed = player.getMovementSpeed();
+        movespeed = settings.getMovespeed();
         Point nextLocation = new Point(playerLocataion.x, playerLocataion.y);
 
         //calculate next position
