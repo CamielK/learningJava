@@ -31,10 +31,10 @@ public class Animation {
     private static List<BufferedImage> playerShotgunImages = new ArrayList<BufferedImage>();
     private static BufferedImage playerImg, playerBox;
     private static Player player = new Player();
-    private static String weaponStatus = "idle";
+    private static String weaponStatus = "idle", moveStatus = "idle";
     private static boolean shooting = false;
 
-    private static int animationTick = 0;
+    private static int characterAnimationTick = 0, feetAnimationTick = 0;
 
     AffineTransform tx = AffineTransform.getRotateInstance(player.getRotation(), 64, 64);
     AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
@@ -69,8 +69,9 @@ public class Animation {
             }
         }
 
+        //dont use this one, wrong resolution
         // add last idle feet sprite at index 80
-        feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/idle/survivor-idle_0.png"));
+        //feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/idle/survivor-idle_0.png"));
 
         // add last tree shoot sprites at index 80, 81 and 82
         for (int i = 0; i < 3; i++) { playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/shoot/survivor-shoot_shotgun_" + i + ".png"));}
@@ -92,7 +93,6 @@ public class Animation {
     }
 
     public void draw(Graphics2D g2d) {
-        //TODO combine these images to print only 1 image instead?
 
         drawFeet(g2d);
         drawCharacter(g2d);
@@ -105,22 +105,48 @@ public class Animation {
     private void updateFeet() {
         //TODO calculate feet sprite index depending on: running? walking? idle? strafing left? strafing right?
 
-        feetSpriteIndex++;
-        if (feetSpriteIndex >= 20) {
+        String oldStatus = moveStatus;
+        moveStatus = player.getMoveStatus();
+
+        if (!oldStatus.equals(moveStatus)) {
+            //restart animation tick when move status changes
+            feetAnimationTick = 0;
+        }
+
+        if (moveStatus.equals("idle")) {
             feetSpriteIndex = 0;
+        }
+        else if (moveStatus.equals("walking")) {
+            feetSpriteIndex = feetAnimationTick;
+        }
+        else if (moveStatus.equals("running")) {
+            feetSpriteIndex = 20 + feetAnimationTick;
+        }
+        else if (moveStatus.equals("strafeLeft")) {
+            feetSpriteIndex = 40 + feetAnimationTick;
+        }
+        else if (moveStatus.equals("strafeRight")) {
+            feetSpriteIndex = 60 + feetAnimationTick;
+        }
+        feetAnimationTick++;
+        if (feetAnimationTick >= 20) {
+            feetAnimationTick = 0;
         }
     }
 
     private void drawFeet(Graphics2D g2d) {
         //draws feet image with calculated feet sprite index
-        String weaponStatus = player.getMoveStatus();
-
-        if (feetSpriteIndex >= 0 && feetSpriteIndex <= 19) {
-            BufferedImage oldImg = feetImagesRunning.get(feetSpriteIndex);
-            BufferedImage newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 50); //(int) (24+(83/2.85))
-
-            g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
+        BufferedImage oldImg = feetImagesRunning.get(feetSpriteIndex);
+        BufferedImage newImg = null;
+        if (player.getMoveStatus().equals("strafeLeft") || player.getMoveStatus().equals("strafeRight")) {
+            newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 30, 40); //strafing leg position
         }
+        else {
+            newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 25, 49); //normal leg position
+        }
+
+
+        g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
     }
 
     private void updateCharacter() {
@@ -129,25 +155,29 @@ public class Animation {
         weaponStatus = player.getWeaponStatus();
 
         if (!oldStatus.equals(weaponStatus) || (shooting != player.isShotFired())) {
-            animationTick = 0;//start animation at 0 the first time status changes
+            characterAnimationTick = 0;//start animation at 0 the first time status changes
             shooting = player.isShotFired();
         }
 
         if (weaponStatus.equals("reloading")) {
-            characterSpriteIndex = 60 + animationTick;
-            animationTick++;
-            if (animationTick >= 20) { player.setWeaponStatus("idle"); animationTick = 0; }
+            characterSpriteIndex = 60 + characterAnimationTick;
+            characterAnimationTick++;
+            if (characterAnimationTick >= 20) { player.setWeaponStatus("idle"); characterAnimationTick = 0; }
         }
         else if (weaponStatus.equals("idle")) {
-
-            characterSpriteIndex = animationTick;
-            animationTick++;
-            if (animationTick >= 20) { animationTick = 0; }
+            if (player.getMoveStatus().equals("idle")) {
+                characterSpriteIndex = characterAnimationTick;
+            }
+            else {
+                characterSpriteIndex = 40 + characterAnimationTick;
+            }
+            characterAnimationTick++;
+            if (characterAnimationTick >= 20) { characterAnimationTick = 0; }
         }
         if (shooting) {
-            characterSpriteIndex = 80 + animationTick;
-            animationTick++;
-            if (animationTick >= 2) { player.setWeaponStatus("idle"); animationTick = 0; }
+            characterSpriteIndex = 80 + characterAnimationTick;
+            characterAnimationTick++;
+            if (characterAnimationTick >= 2) { player.setWeaponStatus("idle"); characterAnimationTick = 0; }
         }
     }
 

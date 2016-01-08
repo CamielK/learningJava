@@ -35,7 +35,7 @@ public class Player {
     private static String moveStatus = "idle"; //for feet and character animation; can be idle, running, walking, strafing left or strafing right
     private static String weaponStatus = "idle"; //for character animation; can be idle, reloading, knifing
     private static String weaponType = "shotgun"; //for character animation; can be shotgun, rifle, knife, handgun or flashlight
-    private static boolean shotFired = false;
+    private static boolean shotFired = false, playerMoved = false;
 
     //ammunition variables
     private static int totalBullets = 300;
@@ -103,6 +103,40 @@ public class Player {
             System.out.println("Could not update bullets. (bullets are being painted)");
         }
 
+        //calculate move status
+        if (!playerMoved) {moveStatus = "idle";}
+        else if (playerMoved) {
+
+            if (movementSpeed == settings.getRunSpeed()) {
+                moveStatus = "running";
+            }
+            else if (movementSpeed == settings.getWalkSpeed()) {
+                moveStatus = "walking";
+            }
+
+            //check for strafing by comparing movement direction to orientation
+            if (rotationDegrees >= -135 && rotationDegrees <= -45) { //north
+                if (orientation.equals("right")) { moveStatus = "strafeRight"; }
+                else if (orientation.equals("left")) { moveStatus = "strafeLeft"; }
+            }
+            else if (rotationDegrees >= -45 && rotationDegrees <= 45) { //east
+                if (orientation.equals("down")) { moveStatus = "strafeRight"; }
+                else if (orientation.equals("up")) { moveStatus = "strafeLeft"; }
+            }
+            else if (rotationDegrees >= 45 && rotationDegrees <= 135) { //south
+                if (orientation.equals("left")) { moveStatus = "strafeRight"; }
+                else if (orientation.equals("right")) { moveStatus = "strafeLeft"; }
+            }
+            else { //west
+                if (orientation.equals("up")) { moveStatus = "strafeRight"; }
+                else if (orientation.equals("down")) { moveStatus = "strafeLeft"; }
+            }
+
+            playerMoved = false;
+        }
+
+        //System.out.println(moveStatus);
+
         animation.update();
     }
 
@@ -144,6 +178,8 @@ public class Player {
             default:
                 break;
         }
+
+        playerMoved = true;
     }
 
     public Point getLocation() {
@@ -192,12 +228,9 @@ public class Player {
         return shotFired;
     }
 
+    //TODO different weapons/items?
     public String getWeaponType() {
         return weaponStatus;
-    }
-
-    public String getOrientation() {
-        return orientation;
     }
 
 }

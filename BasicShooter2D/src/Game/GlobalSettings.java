@@ -10,6 +10,8 @@ public class GlobalSettings {
     private static final int runSpeed = 3;
     private static int currentMoveSpeed = 2;
     public int getMovespeed() { return currentMoveSpeed; }
+    public int getRunSpeed() { return runSpeed; }
+    public int getWalkSpeed() { return walkSpeed; }
     public void setRunSpeed() { currentMoveSpeed = runSpeed; }
     public void setWalkSpeed() { currentMoveSpeed = walkSpeed; }
 
