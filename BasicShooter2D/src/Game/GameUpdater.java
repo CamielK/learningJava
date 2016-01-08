@@ -1,11 +1,16 @@
 package Game;
 
+import Game.Audio.SoundEngine;
+import Game.Clouds.CloudFactory;
+import Game.Map.CollisionChecker;
+import Game.Map.MapCoordinateTranslator;
+import Game.Npcs.Terrorist;
+import Game.Player.Player;
 import GameEngine.Screen;
 import GameEngine.ScreenFactory;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.List;
 
 /**
  * Created by Camiel on 21-Nov-15.
@@ -14,18 +19,22 @@ public class GameUpdater extends Screen {
 
     //import global settings
     private GlobalSettings settings = new GlobalSettings();
+    private final int playerSize = settings.getPlayerSize();
 
     public GameUpdater(ScreenFactory screenFactory) {
         super(screenFactory);
     }
     private GameGUI gui = new GameGUI();
     private Player player = new Player();
+    private CloudFactory cloudFactory = new CloudFactory();
     private Point playerLocataion;
 
+    private SoundEngine soundEngine = new SoundEngine();
+
     //firing
-    private int firerate = 5; //= 12 per second = 720/min
-    private int fireCooldown = firerate; //countdown for new bullet
-    private boolean firing = false;
+    private static int firerate = 4; //= 20 per second = 1200/min
+    private static int fireCooldown = firerate; //countdown for new bullet
+    private static boolean firing = false;
 
     private CollisionChecker collisionChecker;
 
@@ -41,8 +50,13 @@ public class GameUpdater extends Screen {
         collisionChecker = new CollisionChecker();
 
         //Point spawnPoint = mapCoordinateTranslator.getScreenPoint(new Point(1200,1200));
-        terrorist = new Terrorist(new Point(1200,1200));
+        //terrorist = new Terrorist(new Point(1200,1200));
 
+        //background track
+        soundEngine.playLooped("Resources/AUDIO/10_Min_Escalating_Ambient_Battle_soundFX.wav", -3.0f);
+
+        //generate initial clouds
+        cloudFactory.fillField();
     }
 
     @Override
@@ -71,7 +85,11 @@ public class GameUpdater extends Screen {
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SHIFT)) { settings.setRunSpeed(); }
         else { settings.setWalkSpeed(); }
 
+        //update player
         player.updatePlayer();
+
+        //update clouds
+        cloudFactory.updateClouds();
     }
 
     @Override
@@ -80,6 +98,8 @@ public class GameUpdater extends Screen {
         player.drawPlayer(g2d);
 
         if (terrorist != null) { terrorist.drawTerrorist(g2d); }
+
+        cloudFactory.drawClouds(g2d);
     }
 
     private void shoot () {
@@ -147,7 +167,7 @@ public class GameUpdater extends Screen {
                 break;
         }
 
-        collided = collisionChecker.blockMapCollision(new Rectangle(nextLocation.x, nextLocation.y, 64, 64));
+        collided = collisionChecker.blockMapCollision(new Rectangle(nextLocation.x+(playerSize/4), nextLocation.y+(playerSize/4), playerSize/2, playerSize/2));
         return collided;
     }
 }

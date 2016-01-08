@@ -10,6 +10,7 @@ public class GameThread extends JPanel implements Runnable{
 
     private final Game game;
     private boolean running = false;
+    private static int lastFrameCount = 0;
 
     int frames = 0;
 
@@ -41,15 +42,10 @@ public class GameThread extends JPanel implements Runnable{
                 delta -= 1;
             }
 
-//            try { Thread.sleep(2); } catch (InterruptedException e) { e.printStackTrace(); }
-//
-//            if (shouldRender) {
-//                frames++;
-//            }
-
             if (System.currentTimeMillis() - lastTimer >= 1000) { //update counters when second passes
                 lastTimer += 1000;
                 System.out.println(frames + ", " + ticks);
+                lastFrameCount = frames;
                 frames = 0;
                 ticks = 0;
             }
@@ -64,10 +60,16 @@ public class GameThread extends JPanel implements Runnable{
     }
 
     public void paint(Graphics g) {
-        //uncomment to limit framerate
-        try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
-        frames++;
 
+        //dynamicly limits sleeptime when performance drops
+        int sleeptime = 6;
+        if (lastFrameCount < 120) {sleeptime = 3;}
+        else if (lastFrameCount < 90) {sleeptime = 1;}
+        else if (lastFrameCount < 60) {sleeptime = 0;}
+        try { Thread.sleep(sleeptime); } catch (InterruptedException e) { e.printStackTrace(); }
+
+
+        frames++;
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

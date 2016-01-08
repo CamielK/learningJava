@@ -21,4 +21,13 @@ public class GlobalSettings {
     public int getMapSizeX() {return mapSizeX;}
     public int getMapSizeY() {return mapSizeY;}
 
+    //player:
+    private static final int playerSize = 124; //124x124
+    //private static final int playerSize = 313; //313x313
+    private static final int playerXonScreen = 600 - (playerSize / 2);
+    private static final int playerYonScreen = 500 - (playerSize / 2);
+    public int getPlayerSize() {return playerSize;}
+    public int getPlayerXonScreen() {return playerXonScreen;}
+    public int getPlayerYonScreen() {return playerYonScreen;}
+
 }
