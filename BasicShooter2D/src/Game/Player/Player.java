@@ -27,20 +27,20 @@ public class Player {
     private static int playerXonMap = (1300 - (playerSize/2)), playerYonMap = (1200 - (playerSize/2));
 
     //player animation
-    private static Animation animation = new Animation(2); //update every 3rd tick
+    private static Animation animation = new Animation(); //update every 3rd tick
     private static double rotation = Math.toRadians (90);
     private static String orientation = "right";
     private static double rotationDegrees = 90;
     private static int movementSpeed = settings.getMovespeed();
     private static String moveStatus = "idle"; //for feet and character animation; can be idle, running, walking, strafing left or strafing right
-    private static String weaponStatus = "idle"; //for character animation; can be idle, shooting, reloading, knifing
+    private static String weaponStatus = "idle"; //for character animation; can be idle, reloading, knifing
     private static String weaponType = "shotgun"; //for character animation; can be shotgun, rifle, knife, handgun or flashlight
+    private static boolean shotFired = false;
 
     //ammunition variables
     private static int totalBullets = 300;
     private final static int clipSize = 30;
     private static int currentClip = 30;
-    private static boolean reloading = false;
 
     //bullet variables
     private static List<Bullet> bullets = new ArrayList<Bullet>();
@@ -73,6 +73,7 @@ public class Player {
 
         animation.draw(g2d);
 
+
         //ammunition:
         g2d.drawString("Ammo: "+Integer.toString(currentClip)+" / "+totalBullets,50,950);
         if (totalBullets == 0) {
@@ -82,16 +83,11 @@ public class Player {
             g2d.drawString("You need to reload! (R)",550,550);
         }
 
-        //reload
-        if (reloading) {
-            reloading = false;
-            //TODO implement reload animation here
-        }
 
     }
 
     public void updatePlayer() {
-        //update bullet
+        //update bullets
         if (!paintingBullets) {
             updatingBullets = true;
             for (Iterator<Bullet> iter = bullets.listIterator(); iter.hasNext(); ) {
@@ -155,28 +151,20 @@ public class Player {
     }
 
     public void fireWeapon() {
-        if (!updatingBullets && !paintingBullets && currentClip > 0) {
+        if ((!updatingBullets) && (!paintingBullets) && (currentClip > 0) &&  (!weaponStatus.equals("reloading")) ) {
             bullets.add(new Bullet(playerXonMap+(playerSize/2),playerYonMap+(playerSize/2),rotationDegrees,0)); //add new bullet
             currentClip--;
+            shotFired = true;
             soundEngine.playOnce("Resources/AUDIO/gunshot"+ (new Random().nextInt(3)+1) +".wav", -1.0f);
         }
-        else if (currentClip == 0) {
-        }
-        else {
-            System.out.println("Could not add bullet. (bullets are being painted or updated)");
-        }
+//        else {
+//            System.out.println("Could not add bullet. (bullets are being painted or updated)");
+//        }
     }
 
     public void reloadWeapon() {
-        reloading = true;
-        totalBullets += currentClip;
-        if (totalBullets >= clipSize) {
-            currentClip = clipSize;
-            totalBullets -= clipSize;
-        }
-        else {
-            currentClip = totalBullets;
-            totalBullets = 0;
+        if (!weaponStatus.equals("reloading")) {
+            weaponStatus = "reloading";
         }
     }
 
@@ -186,6 +174,22 @@ public class Player {
 
     public String getWeaponStatus(){
         return weaponStatus;
+    }
+
+    public void setWeaponStatus(String newStatus){
+        if (weaponStatus.equals("reloading") && newStatus.equals("idle")) { //animation has finished reloading..
+            totalBullets += currentClip;
+            if (totalBullets >= clipSize) { currentClip = clipSize; totalBullets -= clipSize; }
+            else { currentClip = totalBullets; totalBullets = 0; }
+        }
+        if (shotFired && newStatus.equals("idle")) {
+            shotFired = false;
+        }
+        weaponStatus = newStatus;
+    }
+
+    public boolean isShotFired() {
+        return shotFired;
     }
 
     public String getWeaponType() {

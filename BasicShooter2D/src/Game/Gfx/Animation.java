@@ -30,15 +30,19 @@ public class Animation {
     private static List<BufferedImage> feetImagesRunning = new ArrayList<BufferedImage>();
     private static List<BufferedImage> playerShotgunImages = new ArrayList<BufferedImage>();
     private static BufferedImage playerImg, playerBox;
-    private Player player = new Player();
+    private static Player player = new Player();
+    private static String weaponStatus = "idle";
+    private static boolean shooting = false;
 
-    AffineTransform tx = AffineTransform.getRotateInstance(player.getRotation(), 32, 32);
+    private static int animationTick = 0;
+
+    AffineTransform tx = AffineTransform.getRotateInstance(player.getRotation(), 64, 64);
     AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
 
-    public Animation(int updateSpeed) {
+    public Animation() {
         //TODO bake image sources instead of recalculating every time?
-        this.updateSpeed = updateSpeed;
+        //this.updateSpeed = updateSpeed;
 
         //load all sprites
         for (int i = 0; i <= 79; i++) {
@@ -94,6 +98,10 @@ public class Animation {
         drawCharacter(g2d);
     }
 
+
+
+
+    //########### private methods ###########
     private void updateFeet() {
         //TODO calculate feet sprite index depending on: running? walking? idle? strafing left? strafing right?
 
@@ -105,6 +113,7 @@ public class Animation {
 
     private void drawFeet(Graphics2D g2d) {
         //draws feet image with calculated feet sprite index
+        String weaponStatus = player.getMoveStatus();
 
         if (feetSpriteIndex >= 0 && feetSpriteIndex <= 19) {
             BufferedImage oldImg = feetImagesRunning.get(feetSpriteIndex);
@@ -115,34 +124,46 @@ public class Animation {
     }
 
     private void updateCharacter() {
-        //TODO calculate character sprite index depending on: running? walking? idle? shooting? reloading? melee?
 
-        characterSpriteIndex++;
-        if (characterSpriteIndex >= 20) {
-            characterSpriteIndex = 0;
+        String oldStatus = weaponStatus;
+        weaponStatus = player.getWeaponStatus();
+
+        if (!oldStatus.equals(weaponStatus) || (shooting != player.isShotFired())) {
+            animationTick = 0;//start animation at 0 the first time status changes
+            shooting = player.isShotFired();
+        }
+
+        if (weaponStatus.equals("reloading")) {
+            characterSpriteIndex = 60 + animationTick;
+            animationTick++;
+            if (animationTick >= 20) { player.setWeaponStatus("idle"); animationTick = 0; }
+        }
+        else if (weaponStatus.equals("idle")) {
+
+            characterSpriteIndex = animationTick;
+            animationTick++;
+            if (animationTick >= 20) { animationTick = 0; }
+        }
+        if (shooting) {
+            characterSpriteIndex = 80 + animationTick;
+            animationTick++;
+            if (animationTick >= 2) { player.setWeaponStatus("idle"); animationTick = 0; }
         }
     }
 
     private void drawCharacter(Graphics2D g2d) {
         //draws player image with calculated player sprite index
+        BufferedImage oldImg = playerShotgunImages.get(characterSpriteIndex);
+        BufferedImage newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 24);
 
-        if (characterSpriteIndex >= 0 && characterSpriteIndex <= 19) {
-            BufferedImage oldImg = playerShotgunImages.get(characterSpriteIndex);
-            BufferedImage newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 24);
+        g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
 
-            g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
-
-            g2d.drawRect(playerXonScreen, playerYonScreen, playerSize, playerSize);//outer lines (img border)
-            g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);//inner lines (collides)
+        g2d.drawRect(playerXonScreen, playerYonScreen, playerSize, playerSize);//outer lines (img border)
+        g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);//inner lines (collides)
 
 
-
-            //examples:
-            //new ImageConverter().convertImage(playerShotgunImagesIdle.get(characterSpriteIndex), 2.85, 124, 124, 20, 24);
-            //convertImage(oldFeetImg, 2.85, 124, 124, 20, (24+(83/2.85))) << converts old player sprite into new 124x124
-
-
-
-        }
+        //examples:
+        //new ImageConverter().convertImage(playerShotgunImagesIdle.get(characterSpriteIndex), 2.85, 124, 124, 20, 24);
+        //convertImage(oldFeetImg, 2.85, 124, 124, 20, (24+(83/2.85))) << converts old player sprite into new 124x124
     }
 }
