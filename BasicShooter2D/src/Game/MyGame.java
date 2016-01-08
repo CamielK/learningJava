@@ -10,7 +10,7 @@ public class MyGame {
     private Game game;
 
     public MyGame() {
-        game = new Game(1200, 1000, "Shooter");
+        game = new Game(1200, 1000, "ShooterTest");
         game.getScreenFactory().showScreen(new GameUpdater(game.getScreenFactory()));
     }
 
