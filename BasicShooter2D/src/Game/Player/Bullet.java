@@ -1,6 +1,7 @@
 package Game.Player;
 
 import Game.Map.CollisionChecker;
+import Game.Map.MapCoordinateTranslator;
 
 import java.awt.*;
 
@@ -12,26 +13,28 @@ public class Bullet {
     private double bulletX;
     private double bulletY;
     private double bulletDirection;
-    private int lifetime;
-    private int maxBulletLifetime = 45; //0.75 seconds
-    private int bulletSpeed = 60;
+    private int lifetime = 0;
+    private final int maxBulletLifetime = 45; //0.75 seconds
+    private final int bulletSpeed = 60;
     private boolean expiredStatus = false;
-    private static CollisionChecker collisionChecker = new CollisionChecker();
+    private static final CollisionChecker collisionChecker = new CollisionChecker();
+    private static final MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
 
-    public Bullet(int bulletX, int bulletY, double bulletDirection, int lifetime) {
+    public Bullet(int bulletX, int bulletY, double bulletDirection) {
         this.bulletX = bulletX;
         this.bulletY = bulletY;
         this.bulletDirection = bulletDirection;
-        //System.out.println(bulletDirection);
-        this.lifetime = lifetime;
+        //System.out.println("bullet spawn (x:y:direction) = " + bulletX + ":" + bulletY + ":" + bulletDirection+ ")");
     }
 
 
-    public void drawBullet(Graphics2D g2d, double screenX1, double screenY1) {
+    public void drawBullet(Graphics2D g2d) {
         //TODO screenP1 can be called from MapCoordinateTranslator
         //translate map positions to screen positions
         //draw bullet //subtract screen X1 from bullet X and screen Y1 from bullet Y to get current screen position
-        g2d.fillRect((int) (bulletX - screenX1), (int) (bulletY - screenY1), 5, 5);
+
+        Point screenPos = mapCoordinateTranslator.getScreenPoint(new Point((int)bulletX,(int)bulletY));
+        g2d.fillRect((int) screenPos.getX(), (int) screenPos.getY(), 5, 5);
     }
 
     public int getLifetime() {

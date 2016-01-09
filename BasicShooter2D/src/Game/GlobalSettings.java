@@ -32,4 +32,9 @@ public class GlobalSettings {
     public int getPlayerXonScreen() {return playerXonScreen;}
     public int getPlayerYonScreen() {return playerYonScreen;}
 
+    //screen:
+    private static int screenHeight = 1000;
+    private static int screenWidth = 1200;
+    public int getScreenHeight() {return screenHeight;}
+    public int getScreenWidth() {return screenWidth;}
 }

@@ -1,5 +1,6 @@
 package GameEngine;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -8,9 +9,11 @@ import java.awt.*;
 public abstract class Screen {
 
     private final ScreenFactory screenFactory;
+    private final JFrame window;
 
-    public Screen(ScreenFactory screenFactory) {
+    public Screen(ScreenFactory screenFactory, JFrame window) {
         this.screenFactory = screenFactory;
+        this.window = window;
     }
 
     public abstract void onCreate();
@@ -22,5 +25,7 @@ public abstract class Screen {
     public ScreenFactory getScreenFactory() {
         return screenFactory;
     }
+
+    public JFrame getWindow() { return window; }
 
 }

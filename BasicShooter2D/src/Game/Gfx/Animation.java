@@ -6,6 +6,7 @@ import Game.Player.Player;
 import javafx.scene.transform.Affine;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -29,7 +30,7 @@ public class Animation {
     private static int updateSpeed = 3, ticksSinceLastUpdate = 1; //wait 3 ticks for next sprite
     private static List<BufferedImage> feetImagesRunning = new ArrayList<BufferedImage>();
     private static List<BufferedImage> playerShotgunImages = new ArrayList<BufferedImage>();
-    private static BufferedImage playerImg, playerBox;
+    private static BufferedImage targetImg;
     private static Player player = new Player();
     private static String weaponStatus = "idle", moveStatus = "idle";
     private static boolean shooting = false;
@@ -41,6 +42,7 @@ public class Animation {
 
 
     public Animation() {
+
         //TODO bake image sources instead of recalculating every time?
         //this.updateSpeed = updateSpeed;
 
@@ -76,6 +78,7 @@ public class Animation {
         // add last tree shoot sprites at index 80, 81 and 82
         for (int i = 0; i < 3; i++) { playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/shoot/survivor-shoot_shotgun_" + i + ".png"));}
 
+        targetImg = new ImageLoader().loadImage("Resources/gunTarget.png");
     }
 
     public void update() {
@@ -138,7 +141,7 @@ public class Animation {
         //draws feet image with calculated feet sprite index
         BufferedImage oldImg = feetImagesRunning.get(feetSpriteIndex);
         BufferedImage newImg = null;
-        if (player.getMoveStatus().equals("strafeLeft") || player.getMoveStatus().equals("strafeRight")) {
+        if ( feetSpriteIndex >= 40 && feetSpriteIndex <=79 ) { //if strafing left or right
             newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 30, 40); //strafing leg position
         }
         else {
@@ -164,6 +167,11 @@ public class Animation {
             characterAnimationTick++;
             if (characterAnimationTick >= 20) { player.setWeaponStatus("idle"); characterAnimationTick = 0; }
         }
+        if (weaponStatus.equals("knifing")) {
+            characterSpriteIndex = 20 + characterAnimationTick;
+            characterAnimationTick++;
+            if (characterAnimationTick >= 15) { player.setWeaponStatus("idle"); characterAnimationTick = 0; }
+        }
         else if (weaponStatus.equals("idle")) {
             if (player.getMoveStatus().equals("idle")) {
                 characterSpriteIndex = characterAnimationTick;
@@ -184,9 +192,18 @@ public class Animation {
     private void drawCharacter(Graphics2D g2d) {
         //draws player image with calculated player sprite index
         BufferedImage oldImg = playerShotgunImages.get(characterSpriteIndex);
-        BufferedImage newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 24);
+        BufferedImage newImg = null;
+        if (characterSpriteIndex >= 20 && characterSpriteIndex <= 34) { //if knifing
+            //newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 27, 53); //knifing offset x-(20/2.85) and y-(83/2.85)
+            newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 13, -5); //knifing offset x-(20/2.85) and y-(83/2.85)
+        }
+        else {
+            newImg = new ImageConverter().convertImage(oldImg, 2.85, 124, 124, 20, 24); //normal position
+        }
 
         g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
+
+        if (targetImg != null) g2d.drawImage(op.filter(targetImg, null), playerXonScreen, playerYonScreen, null);
 
         g2d.drawRect(playerXonScreen, playerYonScreen, playerSize, playerSize);//outer lines (img border)
         g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);//inner lines (collides)

@@ -28,6 +28,7 @@ public class Game {
         window.addMouseListener(mousepadListener);
 
         new Thread(gameThread).start();
+
     }
 
     public MousepadListener getMousepadListener() {

@@ -10,6 +10,7 @@ import Game.Player.Player;
 import GameEngine.Screen;
 import GameEngine.ScreenFactory;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -23,9 +24,6 @@ public class GameUpdater extends Screen {
     private final int playerSize = settings.getPlayerSize();
     private int movespeed = settings.getMovespeed();
 
-    public GameUpdater(ScreenFactory screenFactory) {
-        super(screenFactory);
-    }
     private GameGUI gui = new GameGUI();
     private Player player = new Player();
     private CloudFactory cloudFactory = new CloudFactory();
@@ -45,6 +43,12 @@ public class GameUpdater extends Screen {
     private MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
 
 
+    //constructor
+    public GameUpdater(ScreenFactory screenFactory, JFrame window) {
+        super(screenFactory, window);
+    }
+
+
     @Override
     public void onCreate() {
         System.out.println("Creating!");
@@ -55,7 +59,7 @@ public class GameUpdater extends Screen {
         //terrorist = new Terrorist(new Point(1200,1200));
 
         //background track
-        soundEngine.playLooped("Resources/AUDIO/10_Min_Escalating_Ambient_Battle_soundFX.wav", -3.0f);
+        soundEngine.playLooped("Resources/AUDIO/10_Min_Escalating_Ambient_Battle_soundFX.wav", -5.0f);
 
         //generate initial clouds
         cloudFactory.fillField();
@@ -76,13 +80,14 @@ public class GameUpdater extends Screen {
 
         //set player direction pointing towards mouse
         Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-        player.setRotation(mouseLocation);
+        player.setRotation(mouseLocation, getWindow());
 
         //check mouseclick for shooting
         //TODO: enable mouse for shooting instead of spacebar
         //if (getScreenFactory().getGame().getMousepadListener().isMousePressed()) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_R)) { player.reloadWeapon(); }
+        if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_F)) { player.knifeAttack(); }
 
         //running adjust speed:
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SHIFT)) { settings.setRunSpeed(); }
@@ -98,11 +103,13 @@ public class GameUpdater extends Screen {
     @Override
     public void onDraw(Graphics2D g2d) {
         gui.drawGUI(g2d);
-        player.drawPlayer(g2d);
+        player.drawPlayer(g2d, getWindow());
 
         if (terrorist != null) { terrorist.drawTerrorist(g2d); }
 
         cloudFactory.drawClouds(g2d);
+
+
     }
 
     private void shoot () {

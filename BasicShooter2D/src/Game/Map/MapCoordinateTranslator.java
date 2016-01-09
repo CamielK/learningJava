@@ -13,7 +13,7 @@ public class MapCoordinateTranslator {
     private static final GlobalSettings settings = new GlobalSettings();
     private static int movementSpeed = settings.getMovespeed();
 
-    private int screenX1 = 0, screenY1 = 0, screenX2 = 1200, screenY2 = 1000; //screen resolution
+    private static int screenX1 = 0, screenY1 = 0, screenX2 = settings.getScreenWidth(), screenY2 = settings.getScreenHeight(); //screen resolution
     private static int mapX1 = 700, mapY1 = 700, mapX2 = 1900, mapY2 = 1700; //displayed part of map
 
     public Point getScreenPoint(Point mapPoint) {
@@ -53,8 +53,8 @@ public class MapCoordinateTranslator {
                 break;
         }
         //System.out.println(mapX1 + ", " + mapY1);
-        mapX2 = mapX1 + 1200;
-        mapY2 = mapY1 + 1000;
+        mapX2 = mapX1 + screenX2;
+        mapY2 = mapY1 + screenY2;
     }
 
     public Point getCurrentMapLocation() {
