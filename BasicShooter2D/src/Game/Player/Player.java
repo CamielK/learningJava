@@ -29,6 +29,7 @@ public class Player {
     private static int playerXonMap = (1300 - (playerSize/2)), playerYonMap = (1200 - (playerSize/2));
     private static Point weaponPosition = new Point (0,0); //(is a Point to the right of the player center)
     private static MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
+    private static int weaponPixelOffset = 17; //weapon is 17 pixels to the right of the player center
 
     //player animation
     private static Animation animation = new Animation(); //update every 3rd tick
@@ -91,16 +92,17 @@ public class Player {
         }
 
 
-        //draw test line pointing at mouse
-        Point locOnScreen = window.getLocationOnScreen();// does not account for border wich is x3 and y30
-        //System.out.println(locOnScreen);
-        g2d.drawLine(600, 500, (int) (mousePoint.getX() - (locOnScreen.getX()+3)), (int) (mousePoint.getY() - (locOnScreen.getY()+30)));
-
-        Point test = mapCoordinateTranslator.getScreenPoint(weaponPosition);
-        g2d.drawLine((int) test.getX(), (int) test.getY(), (int) (mousePoint.getX() - (locOnScreen.getX()+3)), (int) (mousePoint.getY() - (locOnScreen.getY()+30)));
+        //uncomment to draw guidelines while testing
+//        Point locOnScreen = window.getLocationOnScreen();// does not account for border wich is x3 and y30
+//        g2d.drawLine(600, 500, (int) (mousePoint.getX() - (locOnScreen.getX()+3)), (int) (mousePoint.getY() - (locOnScreen.getY()+30)));
+//        Point test = mapCoordinateTranslator.getScreenPoint(weaponPosition);
+//        g2d.drawLine((int) test.getX(), (int) test.getY(), (int) (mousePoint.getX() - (locOnScreen.getX()+3)), (int) (mousePoint.getY() - (locOnScreen.getY()+30)));
     }
 
     public void updatePlayer() {
+        //update weapon position
+        calculateWeaponPosition(rotationDegrees);
+
         //update bullets
         if (!paintingBullets) {
             updatingBullets = true;
@@ -157,7 +159,7 @@ public class Player {
 
     //calculates player rotation so that player points at mouse
     public void setRotation (Point mouseLocation, JFrame window) {
-        //if (mouseLocation.getX() != mousePoint.getX() || mouseLocation.getY() != mousePoint.getY()) { //only execute when mouse location has changed
+        if (mouseLocation.getX() != mousePoint.getX() || mouseLocation.getY() != mousePoint.getY()) { //only execute when mouse location has changed
             mousePoint = mouseLocation; //save mouse location for future reference
 
             //calculate angle in degrees between player and mouse
@@ -170,11 +172,9 @@ public class Player {
             //get length between player and mouse
             mouseDistance = Math.sqrt((center.getX()-mousePoint.getX())*(center.getX()-mousePoint.getX()) + (center.getY()-mousePoint.getY())*(center.getY()-mousePoint.getY())); //a^2 + b^2 = c^2
 
-            //calculate weapon position (is a Point to the right of the player center)
-            calculateWeaponPosition(degrees);
-
-            //adjust rotation to point gun at mouse location (changes when mouse is further away from player)
-            int rotationOffset = 0;
+            //calculate rotation offset to point weapon at mouse instead of player
+            double correctionAngle = Math.toDegrees(Math.atan2(mouseDistance, weaponPixelOffset));
+            double rotationOffset = 90 - correctionAngle;
 
             //apply offset to degrees (resetting at -180)
             degrees -= rotationOffset;
@@ -185,7 +185,7 @@ public class Player {
             //save calculation results
             rotation = Math.toRadians (degrees);
             rotationDegrees = degrees;
-        //}
+        }
     }
 
     public double getRotation() {
@@ -227,7 +227,7 @@ public class Player {
         //System.out.println("distance to mouse: " + mouseDistance);
 
         if ((!updatingBullets) && (!paintingBullets) && (currentClip > 0) && (!weaponStatus.equals("reloading")) && (!weaponStatus.equals("knifing")) ) {
-            bullets.add(new Bullet((int)weaponPosition.getX(),(int)weaponPosition.getY(),rotationDegrees)); //add new bullet
+            bullets.add(new Bullet(((int)weaponPosition.getX()),((int)weaponPosition.getY()),rotationDegrees)); //add new bullet
             //System.out.println("degrees = " + rotationDegrees + ".         weaponpoint (x:y) = (" + (int)weaponPosition.getX() + ":" + (int)weaponPosition.getY() + ").        playerpoint (x:y) = (" + (playerXonMap+64) + ":" + (playerYonMap+64) + ")");
             currentClip--;
             shotFired = true;
@@ -281,75 +281,16 @@ public class Player {
 
     private void calculateWeaponPosition(double degrees) {
         //Pythagoras equation to determine the weapons position (17 pixels away from the center, at the given angle in degrees)
-        int weaponPixelOffset = 17; //weapon is x pixels away from center of player
         double aboutStanding, adjacent;
         double wepXcor = playerXonMap + (playerSize/2), wepYcor = playerYonMap + (playerSize/2);
 
-        if (degrees >= 0 && degrees <=90) {
-            double angle = degrees;
-            if (angle <= 45) {
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor -= aboutStanding;
-                wepYcor += adjacent;
-            }
-            else {
-                angle -= 45;
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor -= adjacent;
-                wepYcor += aboutStanding;
-            }
-        }
-        else if (degrees >= 90 && degrees <= 180) {
-            double angle = degrees - 90;
-            if (angle <= 45) {
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor -= adjacent;
-                wepYcor -= aboutStanding;
-            }
-            else {
-                angle -= 45;
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor -= aboutStanding;
-                wepYcor -= adjacent;
-            }
-        }
-        else if (degrees <=0 && degrees >= -90) {
-            double angle = Math.abs(degrees);
-            if (angle <= 45) {
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor += aboutStanding;
-                wepYcor += adjacent;
-            }
-            else {
-                angle -= 45;
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor += adjacent;
-                wepYcor += aboutStanding;
-            }
-        }
-        else if (degrees <= -90 && degrees >= -180) {
-            double angle = Math.abs(degrees) - 90;
-            if (angle <= 45) {
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor += adjacent;
-                wepYcor -= aboutStanding;
-            }
-            else {
-                angle -= 45;
-                aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
-                adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
-                wepXcor += aboutStanding;
-                wepYcor -= adjacent;
-            }
-        }
+        degrees+=90; //weapon offset is applied to the right of the player
 
+        aboutStanding = Math.sin(Math.toRadians(degrees)) * weaponPixelOffset;
+        adjacent = Math.cos(Math.toRadians(degrees)) * weaponPixelOffset;
+
+        wepYcor += aboutStanding;
+        wepXcor += adjacent;
 
         //System.out.println("degrees-playerX-playerY-weaponX-weaponY = " + degrees + "-" + (playerXonMap+64) + "-" + (playerYonMap+64) + "-" + wepXcor + "-" + wepYcor);
 

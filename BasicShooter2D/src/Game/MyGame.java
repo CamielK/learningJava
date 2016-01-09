@@ -16,7 +16,7 @@ public class MyGame {
     }
 
     public static void main (String[] args) {
-//
+
 //        double aboutStanding,adjacent;
 //        double angle = 1;
 //        int weaponPixelOffset = 17;
@@ -24,8 +24,18 @@ public class MyGame {
 //        aboutStanding = Math.sin(Math.toRadians(angle)) * weaponPixelOffset;
 //        adjacent = Math.cos(Math.toRadians(angle)) * weaponPixelOffset;
 //
-//        System.out.println(aboutStanding + ":" + adjacent + "   >   " + Math.cos(63));
+//        double correctionAngle = Math.toDegrees(Math.atan2(300, weaponPixelOffset));
+//        double rotationOfsset = 90 - correctionAngle;
 //
+//        //System.out.println(aboutStanding + ":" + adjacent + "   >   " + Math.cos(63));
+//        System.out.println(correctionAngle);
+
+        int a = 50;
+        int b = -20;
+        a += b;
+
+        System.out.println(a);
+
 
         new MyGame();
     }

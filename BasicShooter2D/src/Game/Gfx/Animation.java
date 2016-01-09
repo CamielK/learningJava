@@ -203,10 +203,10 @@ public class Animation {
 
         g2d.drawImage(op.filter(newImg, null), playerXonScreen, playerYonScreen, null);
 
-        if (targetImg != null) g2d.drawImage(op.filter(targetImg, null), playerXonScreen, playerYonScreen, null);
-
-        g2d.drawRect(playerXonScreen, playerYonScreen, playerSize, playerSize);//outer lines (img border)
-        g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);//inner lines (collides)
+        //uncomment to draw guidelines while testing:
+        //if (targetImg != null) g2d.drawImage(op.filter(targetImg, null), playerXonScreen, playerYonScreen, null);
+        //g2d.drawRect(playerXonScreen, playerYonScreen, playerSize, playerSize);//outer lines (img border)
+        //g2d.drawRect(playerXonScreen+(playerSize/4), playerYonScreen+(playerSize/4), playerSize/2, playerSize/2);//inner lines (collides)
 
 
         //examples:

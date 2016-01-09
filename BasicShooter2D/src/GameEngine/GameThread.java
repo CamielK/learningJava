@@ -53,7 +53,7 @@ public class GameThread extends JPanel implements Runnable{
 
             if (System.currentTimeMillis() - lastTimer >= 1000) { //update counters when second passes
                 lastTimer += 1000;
-                System.out.println(frames + ", " + ticks + ", location on screen: " + this.getLocationOnScreen());
+                System.out.println(frames + ", " + ticks);
                 lastFrameCount = frames;
                 frames = 0;
                 ticks = 0;

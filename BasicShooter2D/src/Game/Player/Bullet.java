@@ -20,21 +20,35 @@ public class Bullet {
     private static final CollisionChecker collisionChecker = new CollisionChecker();
     private static final MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
 
+    private Point spawnPoint;
+    private Point trajectoryEnd;
+
     public Bullet(int bulletX, int bulletY, double bulletDirection) {
         this.bulletX = bulletX;
         this.bulletY = bulletY;
         this.bulletDirection = bulletDirection;
         //System.out.println("bullet spawn (x:y:direction) = " + bulletX + ":" + bulletY + ":" + bulletDirection+ ")");
+
+        spawnPoint = new Point(bulletX,bulletY);
+        trajectoryEnd = calculateNextPosition(spawnPoint, 400);
     }
 
 
     public void drawBullet(Graphics2D g2d) {
-        //TODO screenP1 can be called from MapCoordinateTranslator
         //translate map positions to screen positions
-        //draw bullet //subtract screen X1 from bullet X and screen Y1 from bullet Y to get current screen position
 
-        Point screenPos = mapCoordinateTranslator.getScreenPoint(new Point((int)bulletX,(int)bulletY));
-        g2d.fillRect((int) screenPos.getX(), (int) screenPos.getY(), 5, 5);
+        //draw bullet
+        if (lifetime >= 2) { //dont draw the first 2 times
+            Point screenPos = mapCoordinateTranslator.getScreenPoint(new Point((int)bulletX,(int)bulletY));
+            g2d.fillRect((int) screenPos.getX(), (int) screenPos.getY(), 5, 5);
+        }
+
+        //draw trajectory
+//        g2d.setColor(Color.RED);
+//        Point spawnPointOnScreen = mapCoordinateTranslator.getScreenPoint(spawnPoint);
+//        Point endPointOnScreen = mapCoordinateTranslator.getScreenPoint(trajectoryEnd);
+//        g2d.drawLine((int)spawnPointOnScreen.getX(),(int)spawnPointOnScreen.getY(),(int)endPointOnScreen.getX(),(int)endPointOnScreen.getY());
+//        g2d.setColor(Color.BLACK);
     }
 
     public int getLifetime() {
@@ -74,40 +88,10 @@ public class Bullet {
         lifetime++;
         if (lifetime >= maxBulletLifetime) { expiredStatus = true; }
 
-        double xMovePercentage = 0, yMovePercentage = 0;
-
-        //System.out.println(bulletDirection);
-
-        if (bulletDirection >= 0 && bulletDirection <=90) { //south-east
-            xMovePercentage = 1 - (bulletDirection / 90);
-            yMovePercentage = (bulletDirection / 90);
-            bulletX += (bulletSpeed * xMovePercentage);
-            bulletY += (bulletSpeed * yMovePercentage);
-        }
-        else if (bulletDirection >= 90 && bulletDirection <= 180) { //south-west
-            bulletDirection -= 90;
-            xMovePercentage = (bulletDirection / 90);
-            yMovePercentage = 1 - (bulletDirection / 90);
-            bulletX -= (bulletSpeed * xMovePercentage);
-            bulletY += (bulletSpeed * yMovePercentage);
-            bulletDirection += 90;
-        }
-        else if (bulletDirection <=0 && bulletDirection >= -90) { //north-east
-            xMovePercentage = 1 - (Math.abs(bulletDirection / 90));
-            yMovePercentage = (Math.abs(bulletDirection / 90));
-            bulletX += (bulletSpeed * xMovePercentage);
-            bulletY -= (bulletSpeed * yMovePercentage);
-        }
-        else if (bulletDirection <= -90 && bulletDirection >= -180) { //north-west
-            bulletDirection += 90;
-            xMovePercentage = (Math.abs(bulletDirection / 90));
-            yMovePercentage = 1 - (Math.abs(bulletDirection / 90));
-            bulletX -= (bulletSpeed * xMovePercentage);
-            bulletY -= (bulletSpeed * yMovePercentage);
-            bulletDirection -= 90;
-        }
-
-
+        Point oldPosition = new Point((int)bulletX, (int)bulletY);
+        Point newPosition = calculateNextPosition(oldPosition, bulletSpeed);
+        bulletX = (int) newPosition.getX();
+        bulletY = (int) newPosition.getY();
 
         boolean collision = false;
         collision = collisionChecker.blockMapCollision(new Rectangle((int) bulletX - 5, (int) bulletY - 5, 15, 15)); //bullets are 5x5, this checks for the 15x15 area around the bullet
@@ -118,5 +102,18 @@ public class Bullet {
 
     public boolean isExpired() {
         return expiredStatus;
+    }
+
+    private Point calculateNextPosition(Point oldPos, int speed){
+        int newX = (int)oldPos.getX(), newY = (int)oldPos.getY();
+        double adjacent = 0, aboutStanding = 0;
+
+        aboutStanding = Math.sin(Math.toRadians(bulletDirection)) * speed;
+        adjacent = Math.cos(Math.toRadians(bulletDirection)) * speed;
+
+        newY += aboutStanding;
+        newX += adjacent;
+
+        return new Point(newX, newY);
     }
 }
