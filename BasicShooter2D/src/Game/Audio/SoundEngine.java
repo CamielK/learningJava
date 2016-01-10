@@ -1,11 +1,16 @@
 package Game.Audio;
 
 
+import Game.Player.Bullet;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -13,53 +18,31 @@ import java.util.Random;
  */
 public class SoundEngine {
 
-    public static synchronized void playLooped(final String fileName, final float volumeOffset)
-    {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    URL url = getClass().getClassLoader().getResource(fileName);
-                    Clip clip = AudioSystem.getClip();
-                    AudioInputStream ais = AudioSystem.getAudioInputStream(url);
-                    clip.open(ais);
+    private static List<AudioFragment> audioFragments = new ArrayList<AudioFragment>();
+    private static boolean jetFlyby = false;
 
-                    //stereo
-                    //System.out.println(clip.getFormat());
-
-                    //volume control
-                    FloatControl gainControl =
-                            (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                    gainControl.setValue(volumeOffset); // adjust volume with given offset.
+    public void update() {
+        //TODO update audio logic
 
 
-                    clip.loop(-1); // loop continuously
-                } catch (Exception e) {
-                    System.out.println("play sound error: " + e.getMessage() + " for " + fileName);
-                }
-            }
-        }).start();
+        //random jet flyby
+        if (new Random().nextInt(10000) < 1) { //0.1% chance (&& !jetFlyby)
+            jetFlyby = true;
+            addSound("Resources/AUDIO/jet_flyby.wav", +2.0f, false);
+        }
+
+        //play();
     }
 
-    public static synchronized void playOnce(final String fileName, final float volumeOffset)
-    {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    URL url = getClass().getClassLoader().getResource(fileName);
-                    Clip clip = AudioSystem.getClip();
-                    AudioInputStream ais = AudioSystem.getAudioInputStream(url);
-                    clip.open(ais);
+    private void play() {
+        //TODO manage new audio being played and stop running audio
+        for (Iterator<AudioFragment> iter = audioFragments.listIterator(); iter.hasNext(); ) {
+            //
+        }
 
-                    //volume control
-                    FloatControl gainControl =
-                            (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                    gainControl.setValue(volumeOffset); // Reduce volume by 10 decibels.
+    }
 
-                    clip.loop(0);
-                } catch (Exception e) {
-                    System.out.println("play sound error: " + e.getMessage() + " for " + fileName);
-                }
-            }
-        }).start();
+    public void addSound(String filename, float volumeOffset, boolean loop) {
+        audioFragments.add(new AudioFragment(filename, volumeOffset, loop));
     }
 }

@@ -14,8 +14,8 @@ public class Bullet {
     private double bulletY;
     private double bulletDirection;
     private int lifetime = 0;
-    private final int maxBulletLifetime = 45; //0.75 seconds
-    private final int bulletSpeed = 60;
+    private final int maxBulletLifetime = 90; //45 = 0.75 seconds at 60 ticks
+    private final int bulletSpeed = 25;
     private boolean expiredStatus = false;
     private static final CollisionChecker collisionChecker = new CollisionChecker();
     private static final MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
@@ -30,7 +30,7 @@ public class Bullet {
         //System.out.println("bullet spawn (x:y:direction) = " + bulletX + ":" + bulletY + ":" + bulletDirection+ ")");
 
         spawnPoint = new Point(bulletX,bulletY);
-        trajectoryEnd = calculateNextPosition(spawnPoint, 400);
+        trajectoryEnd = calculateNextPosition(spawnPoint, 700);
     }
 
 
@@ -38,7 +38,7 @@ public class Bullet {
         //translate map positions to screen positions
 
         //draw bullet
-        if (lifetime >= 2) { //dont draw the first 2 times
+        if (lifetime >= 3) { //dont draw the first 2 times
             Point screenPos = mapCoordinateTranslator.getScreenPoint(new Point((int)bulletX,(int)bulletY));
             g2d.fillRect((int) screenPos.getX(), (int) screenPos.getY(), 5, 5);
         }
@@ -94,9 +94,10 @@ public class Bullet {
         bulletY = (int) newPosition.getY();
 
         boolean collision = false;
-        collision = collisionChecker.blockMapCollision(new Rectangle((int) bulletX - 5, (int) bulletY - 5, 15, 15)); //bullets are 5x5, this checks for the 15x15 area around the bullet
-        if (collision) {
-            expiredStatus = true;
+        for (int i = 0; i < bulletSpeed; i += bulletSpeed/5) { //check next 5 sub positions between the next position
+            //bullets are 5x5, checks for the 15x15 area around the bullet
+            Point pos = calculateNextPosition(oldPosition, i);
+            if (collisionChecker.rectIntersectsBlockMap(new Rectangle(pos.x - 5, pos.y - 5, 15, 15))) { expiredStatus = true; }
         }
     }
 

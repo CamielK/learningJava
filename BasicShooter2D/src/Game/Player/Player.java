@@ -2,15 +2,11 @@ package Game.Player;
 
 import Game.Audio.SoundEngine;
 import Game.Gfx.Animation;
-import Game.Gfx.ImageLoader;
 import Game.GlobalSettings;
 import Game.Map.MapCoordinateTranslator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
@@ -231,7 +227,7 @@ public class Player {
             //System.out.println("degrees = " + rotationDegrees + ".         weaponpoint (x:y) = (" + (int)weaponPosition.getX() + ":" + (int)weaponPosition.getY() + ").        playerpoint (x:y) = (" + (playerXonMap+64) + ":" + (playerYonMap+64) + ")");
             currentClip--;
             shotFired = true;
-            soundEngine.playOnce("Resources/AUDIO/gunshot"+ (new Random().nextInt(3)+1) +".wav", -1.0f);
+            soundEngine.addSound("Resources/AUDIO/gunshot"+ (new Random().nextInt(3)+1) +".wav", -1.0f, false);
         }
 //        else {
 //            System.out.println("Could not add bullet. (bullets are being painted or updated)");

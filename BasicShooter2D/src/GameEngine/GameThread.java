@@ -91,10 +91,10 @@ public class GameThread extends JPanel implements Runnable{
 
 
         //dynamicly limits sleeptime when performance drops
-        int sleeptime = 6;
-        if (lastFrameCount < 120) {sleeptime = 3;}
-        else if (lastFrameCount < 90) {sleeptime = 1;}
-        else if (lastFrameCount < 60) {sleeptime = 0;}
+        int sleeptime = 5;
+//        if (lastFrameCount < 120) {sleeptime = 3;}
+//        else if (lastFrameCount < 90) {sleeptime = 1;}
+//        else if (lastFrameCount < 60) {sleeptime = 0;}
         try { Thread.sleep(sleeptime); } catch (InterruptedException e) { e.printStackTrace(); }
 
     }

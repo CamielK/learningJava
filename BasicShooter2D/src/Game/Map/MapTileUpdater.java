@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * generates and keeps track of all map tiles and their status
+ *
+ *
  * Created by Camiel on 26-Nov-15.
  */
 public class MapTileUpdater {
@@ -69,10 +73,12 @@ public class MapTileUpdater {
     }
 
     public void setTileStatus(Point objectLocationP1, Point objectLocationP2, String status) {
+        //updates the status of all maptiles intersecting with the given rectangle
 
     }
 
     public List<Integer> getMapTileIndexes(Rectangle object) {
+        //returns a list of indexes that point to the maptiles intersecting with the given rectangle
 
         int objectP1Index = getMapTileIndex(new Point( (int) object.getX(), (int) object.getY()));
         int objectP2Index = getMapTileIndex(new Point( (int) (object.getX() + object.getWidth()), (int) (object.getY() + object.getHeight())));

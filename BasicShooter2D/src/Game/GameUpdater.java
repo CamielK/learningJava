@@ -2,7 +2,6 @@ package Game;
 
 import Game.Audio.SoundEngine;
 import Game.Clouds.CloudFactory;
-import Game.Gfx.ImageLoader;
 import Game.Map.CollisionChecker;
 import Game.Map.MapCoordinateTranslator;
 import Game.Npcs.Terrorist;
@@ -59,7 +58,7 @@ public class GameUpdater extends Screen {
         //terrorist = new Terrorist(new Point(1200,1200));
 
         //background track
-        soundEngine.playLooped("Resources/AUDIO/10_Min_Escalating_Ambient_Battle_soundFX.wav", -5.0f);
+        soundEngine.addSound("Resources/AUDIO/10_Min_Escalating_Ambient_Battle_soundFX.wav", -5.0f, true);
 
         //generate initial clouds
         cloudFactory.fillField();
@@ -98,6 +97,9 @@ public class GameUpdater extends Screen {
 
         //update clouds
         cloudFactory.updateClouds();
+
+        //update sound engine
+        soundEngine.update();
     }
 
     @Override
@@ -177,7 +179,7 @@ public class GameUpdater extends Screen {
                 break;
         }
 
-        collided = collisionChecker.blockMapCollision(new Rectangle(nextLocation.x+(playerSize/4), nextLocation.y+(playerSize/4), playerSize/2, playerSize/2));
+        collided = collisionChecker.rectIntersectsBlockMap(new Rectangle(nextLocation.x+(playerSize/4), nextLocation.y+(playerSize/4), playerSize/2, playerSize/2));
         return collided;
     }
 }

@@ -48,9 +48,8 @@ public class CollisionChecker {
         return collision;
     }
 
-
-    public boolean blockMapCollision(Rectangle object) {
-        //checks if object (rectangle) collides with blocked tiles
+    public boolean rectIntersectsBlockMap(Rectangle object) {
+        //checks if object (rectangle) collides with blockmap tiles
         boolean collided = false;
 
         //get list of all maptile indexes that contain the object
@@ -67,5 +66,32 @@ public class CollisionChecker {
         }
 
         return collided;
+    }
+
+    public int lineIntersectsBlockMap(Point p1, Point p2) {
+        //returns the index of the maptile where the line intersects with the blockmap, returns 0 when no intersects
+
+        return 0;
+    }
+
+    private boolean lineIntersectsLine(Point l1p1, Point l1p2, Point l2p1, Point l2p2) {
+        //returns true if the gives lines intersect at any point
+
+        float q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+        float d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+
+        if( d == 0 ) { return false; }
+
+        float r = q / d;
+
+        q = (l1p1.x - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+        float s = q / d;
+
+        if( r < 0 || r > 1 || s < 0 || s > 1 )
+        {
+            return false;
+        }
+
+        return true;
     }
 }
