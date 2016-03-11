@@ -26,10 +26,11 @@ public class Animation {
     private static final int playerXonScreen = settings.getPlayerXonScreen(), playerYonScreen = settings.getPlayerYonScreen();
     private static final int playerSize = settings.getPlayerSize();
 
-    private static int feetSpriteIndex = 0, characterSpriteIndex = 0;
+    private static int feetSpriteIndex = 0, characterSpriteIndex = 0, explosionSpriteIndex = 0;
     private static int updateSpeed = 3, ticksSinceLastUpdate = 1; //wait 3 ticks for next sprite
     private static List<BufferedImage> feetImagesRunning = new ArrayList<BufferedImage>();
     private static List<BufferedImage> playerShotgunImages = new ArrayList<BufferedImage>();
+    private static List<BufferedImage> explosionImages = new ArrayList<BufferedImage>();
     private static BufferedImage targetImg;
     private static Player player = new Player();
     private static String weaponStatus = "idle", moveStatus = "idle";
@@ -40,6 +41,7 @@ public class Animation {
     AffineTransform tx = AffineTransform.getRotateInstance(player.getRotation(), 64, 64);
     AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
+    private static ImageLoader imageLoader = new ImageLoader();
 
     public Animation() {
 
@@ -50,35 +52,51 @@ public class Animation {
         for (int i = 0; i <= 79; i++) {
 
             if (i >= 0 && i <= 19) { //first 20 sprites
-                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/walk/survivor-walk_" + i + ".png")); // walk feet sprites
-                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/idle/survivor-idle_shotgun_" + i + ".png")); //idle shotgun sprites
+                feetImagesRunning.add(imageLoader.loadImage("Resources/playerSprites/feet/walk/survivor-walk_" + i + ".png")); // walk feet sprites
+                playerShotgunImages.add(imageLoader.loadImage("Resources/playerSprites/shotgun/idle/survivor-idle_shotgun_" + i + ".png")); //idle shotgun sprites
             }
             else if (i >= 20 && i <= 39) { //second 20 sprites
                 int index = i - 20;
-                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/run/survivor-run_" + index + ".png")); // run feet sprites
-                if (index < 15) {playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/meleeattack/survivor-meleeattack_shotgun_" + index + ".png"));} // meleeattack shotgun sprites <<< lasts only 15 sprites
+                feetImagesRunning.add(imageLoader.loadImage("Resources/playerSprites/feet/run/survivor-run_" + index + ".png")); // run feet sprites
+                if (index < 15) {playerShotgunImages.add(imageLoader.loadImage("Resources/playerSprites/shotgun/meleeattack/survivor-meleeattack_shotgun_" + index + ".png"));} // meleeattack shotgun sprites <<< lasts only 15 sprites
                 else { playerShotgunImages.add(null); } //add 5 nulls to make sure next set of sprites starts at 40
             }
             else if (i >= 40 && i <= 59) { //third 20 sprites
                 int index = i - 40;
-                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/strafe_left/survivor-strafe_left_" + index + ".png")); // strafe left feet sprites
-                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/move/survivor-move_shotgun_" + index + ".png")); //movement shotgun sprites
+                feetImagesRunning.add(imageLoader.loadImage("Resources/playerSprites/feet/strafe_left/survivor-strafe_left_" + index + ".png")); // strafe left feet sprites
+                playerShotgunImages.add(imageLoader.loadImage("Resources/playerSprites/shotgun/move/survivor-move_shotgun_" + index + ".png")); //movement shotgun sprites
             }
             else if (i >= 60 && i <= 79) { //fourth 20 sprites
                 int index = i - 60;
-                feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/strafe_right/survivor-strafe_right_" + index + ".png")); // strafe right feet sprites
-                playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/reload/survivor-reload_shotgun_" + index + ".png")); //reload shotgun sprites
+                feetImagesRunning.add(imageLoader.loadImage("Resources/playerSprites/feet/strafe_right/survivor-strafe_right_" + index + ".png")); // strafe right feet sprites
+                playerShotgunImages.add(imageLoader.loadImage("Resources/playerSprites/shotgun/reload/survivor-reload_shotgun_" + index + ".png")); //reload shotgun sprites
             }
         }
 
+        //load explosion images
+//        int xCor = 0, yCor = 0 ;
+//        BufferedImage explosionSprite = imageLoader.loadImage("Resources/explosion_tileset.png");
+//        for (int i = 1; i <= 64; i++) {
+//            BufferedImage newImg = new BufferedImage(124, 124, BufferedImage.TYPE_INT_ARGB); // Create a buffered image with transparency
+//            Graphics2D bGr = newImg.createGraphics();
+//            bGr.drawImage(explosionSprite, 0, 0, 124, 124, xCor, yCor, xCor+124, yCor+124, null);
+//            explosionImages.add(newImg);
+//            xCor += 124;
+//            if (i%8 == 0) { //next row
+//                xCor = 0;
+//                yCor += 124;
+//            }
+//            bGr.dispose();
+//        }
+        
         //dont use this one, wrong resolution
         // add last idle feet sprite at index 80
-        //feetImagesRunning.add(new ImageLoader().loadImage("Resources/playerSprites/feet/idle/survivor-idle_0.png"));
+        //feetImagesRunning.add(imageLoader.loadImage("Resources/playerSprites/feet/idle/survivor-idle_0.png"));
 
         // add last tree shoot sprites at index 80, 81 and 82
-        for (int i = 0; i < 3; i++) { playerShotgunImages.add(new ImageLoader().loadImage("Resources/playerSprites/shotgun/shoot/survivor-shoot_shotgun_" + i + ".png"));}
+        for (int i = 0; i < 3; i++) { playerShotgunImages.add(imageLoader.loadImage("Resources/playerSprites/shotgun/shoot/survivor-shoot_shotgun_" + i + ".png"));}
 
-        targetImg = new ImageLoader().loadImage("Resources/gunTarget.png");
+        targetImg = imageLoader.loadImage("Resources/gunTarget.png");
     }
 
     public void update() {
@@ -99,6 +117,12 @@ public class Animation {
 
         drawFeet(g2d);
         drawCharacter(g2d);
+
+
+        //g2d.drawImage( imageLoader.loadImage("Resources/explosion_tileset.png"), 300, 300, null);
+//        g2d.drawImage(explosionImages.get(explosionSpriteIndex), 300, 300, 424,424,0,0,124,124,null);
+//        explosionSpriteIndex++;
+//        if (explosionSpriteIndex >= 64) explosionSpriteIndex = 0;
     }
 
 

@@ -97,7 +97,7 @@ public class Bullet {
         for (int i = 0; i < bulletSpeed; i += bulletSpeed/5) { //check next 5 sub positions between the next position
             //bullets are 5x5, checks for the 15x15 area around the bullet
             Point pos = calculateNextPosition(oldPosition, i);
-            if (collisionChecker.rectIntersectsBlockMap(new Rectangle(pos.x - 5, pos.y - 5, 15, 15))) { expiredStatus = true; }
+            if (collisionChecker.rectIntersectsBlockMap(new Rectangle(pos.x, pos.y, 5, 5))) { expiredStatus = true; }
         }
     }
 

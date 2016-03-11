@@ -87,6 +87,7 @@ public class GameUpdater extends Screen {
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SPACE)) { shoot(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_R)) { player.reloadWeapon(); }
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_F)) { player.knifeAttack(); }
+        if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_E)) { airStrike(); }
 
         //running adjust speed:
         if (getScreenFactory().getGame().getKeyboardListener().isKeyPressed(KeyEvent.VK_SHIFT)) { settings.setRunSpeed(); }
@@ -120,6 +121,10 @@ public class GameUpdater extends Screen {
             player.fireWeapon();
             fireCooldown = 0;
         }
+    }
+
+    private void airStrike () {
+        //TODO implement airstrike
     }
 
 

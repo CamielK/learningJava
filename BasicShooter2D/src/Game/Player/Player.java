@@ -25,7 +25,7 @@ public class Player {
     private static int playerXonMap = (1300 - (playerSize/2)), playerYonMap = (1200 - (playerSize/2));
     private static Point weaponPosition = new Point (0,0); //(is a Point to the right of the player center)
     private static MapCoordinateTranslator mapCoordinateTranslator = new MapCoordinateTranslator();
-    private static int weaponPixelOffset = 17; //weapon is 17 pixels to the right of the player center
+    private static int weaponPixelOffset = 15; //weapon is 15 pixels to the right of the player center
 
     //player animation
     private static Animation animation = new Animation(); //update every 3rd tick
